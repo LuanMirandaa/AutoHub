@@ -17,11 +17,11 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _minPriceController = TextEditingController();
   final TextEditingController _maxPriceController = TextEditingController();
 
-  // Filtros
-  String? _selectedState; // "Novo", "Usado", "Semi-novo"
+
+  String? _selectedState; 
   final List<String> _selectedBrands = [];
 
-  // Dados fictícios para simular ofertas de carros
+
   final List<Map<String, dynamic>> _offers = [
     {
       "price": 132580,
@@ -51,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<String> _brands = ["Honda", "Chevrolet", "Ford"];
 
-  // Função para filtrar ofertas
+  
   List<Map<String, dynamic>> _filterOffers() {
     int? minPrice = int.tryParse(_minPriceController.text);
     int? maxPrice = int.tryParse(_maxPriceController.text);
@@ -89,15 +89,16 @@ class _HomeScreenState extends State<HomeScreen> {
       drawer: Menu(user: widget.user),
       appBar: AppBar(
         title: const Text("Auto Hub"),
-        backgroundColor: Colors.purple,
+        backgroundColor: Colors.purple[30],
       ),
       body: Row(
         children: [
-          // Filtro lateral
+          
           Container(
             width: MediaQuery.of(context).size.width * 0.3,
-            color: Colors.purple[50],
-            padding: const EdgeInsets.all(10),
+            height: double.infinity,
+            color: Colors.purple[30],
+            padding: const EdgeInsets.all(50),
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,25 +180,73 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: Colors.purple, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
-                  ..._brands.map((brand) {
-                    return CheckboxListTile(
-                      title: Text(brand),
-                      value: _selectedBrands.contains(brand),
-                      onChanged: (bool? value) {
-                        _toggleBrand(brand);
-                      },
-                    );
-                  }).toList(),
+                  Wrap(
+                    spacing: 8,
+                    children: _selectedBrands.map((brand) {
+                      return Chip(
+                        label: Text(brand),
+                        backgroundColor: Colors.purple[50],
+                        labelStyle: const TextStyle(color: Colors.purple),
+                        deleteIcon:
+                            const Icon(Icons.close, color: Colors.purple),
+                        onDeleted: () => _toggleBrand(brand),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 10),
+                  GestureDetector(
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: _brands.map((brand) {
+                              return ListTile(
+                                title: Text(brand),
+                                trailing: _selectedBrands.contains(brand)
+                                    ? const Icon(Icons.check,
+                                        color: Colors.purple)
+                                    : null,
+                                onTap: () {
+                                  Navigator.pop(context); 
+                                  _toggleBrand(
+                                      brand);
+                                },
+                              );
+                            }).toList(),
+                          );
+                        },
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.purple[50],
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: const [
+                          Text(
+                            "Selecionar Marcas",
+                            style: TextStyle(color: Colors.purple),
+                          ),
+                          Icon(Icons.expand_more, color: Colors.purple),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
-          // Lista de ofertas
+          
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(25),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   const Text(
                     "Últimas ofertas",
@@ -243,36 +292,32 @@ class _HomeScreenState extends State<HomeScreen> {
                                       image: NetworkImage(offer["image"]!),
                                       fit: BoxFit.cover,
                                     ),
-                                    borderRadius: BorderRadius.circular(10),
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "R\$ ${offer["price"].toStringAsFixed(2).replaceAll('.', ',')}",
-                                          style: const TextStyle(
-                                            color: Colors.purple,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 5),
-                                        Text(
-                                          offer["title"]!,
-                                          style: const TextStyle(fontSize: 14),
-                                        ),
-                                        const SizedBox(height: 5),
-                                        Text(
-                                          offer["details"]!,
-                                          style: const TextStyle(fontSize: 12),
-                                        ),
-                                      ],
+                                const SizedBox(width: 15),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      offer["title"]!,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.purple,
+                                      ),
                                     ),
-                                  ),
+                                    Text(offer["details"]!),
+                                    const SizedBox(height: 5),
+                                    Text(
+                                      "R\$ ${offer["price"]}",
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.purple[600],
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -293,30 +338,42 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class OfferDetailsScreen extends StatelessWidget {
   final Map<String, dynamic> offer;
-
   const OfferDetailsScreen({super.key, required this.offer});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(offer["title"]!)),
+      appBar: AppBar(
+        title: Text(offer["title"]!),
+        backgroundColor: Colors.purple,
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.network(offer["image"]!, height: 200, fit: BoxFit.cover),
-            const SizedBox(height: 20),
+            Image.network(offer["image"]!),
+            const SizedBox(height: 10),
             Text(
-              "R\$ ${offer["price"].toStringAsFixed(2).replaceAll('.', ',')}",
+              offer["title"]!,
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.purple,
               ),
             ),
             const SizedBox(height: 10),
-            Text(offer["details"]!),
+            Text(
+              offer["details"]!,
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              "R\$ ${offer["price"]}",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.purple[600],
+              ),
+            ),
           ],
         ),
       ),
