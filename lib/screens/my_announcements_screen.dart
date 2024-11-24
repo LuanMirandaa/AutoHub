@@ -7,7 +7,7 @@ import 'package:uuid/uuid.dart';
 
 class MyAnnouncementsScreen extends StatefulWidget {
   final User user;
-  MyAnnouncementsScreen({super.key, required this.user});
+  const MyAnnouncementsScreen({super.key, required this.user});
 
   @override
   State<MyAnnouncementsScreen> createState() => _MyAnnouncementsScreenState();
@@ -17,6 +17,7 @@ class _MyAnnouncementsScreenState extends State<MyAnnouncementsScreen> {
   List<Car> listCars = [];
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
+  @override
   void initState() {
     super.initState();
     refresh();
