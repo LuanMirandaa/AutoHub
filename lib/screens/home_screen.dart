@@ -232,7 +232,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             "Selecionar Marcas",
                             style: TextStyle(color: Colors.purple),
                           ),
-                          Icon(Icons.expand_more, color: Colors.purple),
                         ],
                       ),
                     ),
@@ -241,7 +240,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(25),
