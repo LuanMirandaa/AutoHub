@@ -29,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
       "details": "37000 Km\n2.0\nPE - Recife",
       "brand": "Honda",
       "state": "Novo",
-      "image": "https://via.placeholder.com/150"
+      "image": "assets/images/image 156.png"
     },
     {
       "price": 45900,
@@ -334,6 +334,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+
+
 class OfferDetailsScreen extends StatelessWidget {
   final Map<String, dynamic> offer;
   const OfferDetailsScreen({super.key, required this.offer});
@@ -341,40 +343,226 @@ class OfferDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(offer["title"]!),
-        backgroundColor: Colors.purple,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Image.network(offer["image"]!),
-            const SizedBox(height: 10),
-            Text(
-              offer["title"]!,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+      body: Stack(
+        children: [
+          // Conteúdo principal da página
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 120, left: 20, right: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                  children: [
+                                  SizedBox(
+                    height: 400, // Altura fixa
+                    width:800, // Largura ocupando todo o espaço disponível
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.network(
+                        offer["image"],
+                        fit: BoxFit
+                            .fill, // Faz a imagem preencher o espaço da SizedBox proporcionalmente
+                      ),
+                    ),
+                  ),
+                  SizedBox(width:MediaQuery.of(context).size.width * 0.2 ,),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Container(
+                        color: Colors.purple[30],
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.orange, // Cor de fundo do botão
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                      30), // Borda arredondada
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 60,
+                                    vertical:25), // Padding do botão
+                                textStyle: const TextStyle(
+                                  fontSize: 22, // Tamanho do texto
+                                  fontWeight: FontWeight.bold, // Peso da fonte
+                                ),
+                              ),
+                              onPressed: () {},
+                              child: const Text(
+                                "Comprar", // Texto do botão
+                                style: TextStyle(
+                                    color: Colors.white), // Cor do texto
+                              ),
+                            ),
+                            const SizedBox(height: 60),
+
+                                OutlinedButton.icon(
+                                  onPressed: () {},
+                                  icon: const Icon(Icons.chat,
+                                      color:
+                                          Color(0xFF870989)), // Ícone do botão
+                                  label: const Text(
+                                    "Chat", // Texto do botão
+                                    style: TextStyle(
+                                      color: Color(0xFF870989), // Cor do texto
+                                      fontSize: 16, // Tamanho do texto
+                                    ),
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    side: const BorderSide(
+                                        color:
+                                            Color(0xFF870989)), // Cor da borda
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          30), // Borda arredondada
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 30,
+                                        vertical: 12), // Padding
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                OutlinedButton.icon(
+                                  onPressed: () {},
+                                  icon: const Icon(Icons.favorite,
+                                      color:
+                                          Color(0xFF870989)), // Ícone do botão
+                                  label: const Text(
+                                    "Favoritar", // Texto do botão
+                                    style: TextStyle(
+                                      color: Color(0xFF870989), // Cor do texto
+                                      fontSize: 16, // Tamanho do texto
+                                    ),
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    side: const BorderSide(
+                                        color:
+                                            Color(0xFF870989)), // Cor da borda
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          30), // Borda arredondada
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 30,
+                                        vertical: 12), // Padding
+                                  ),
+                                ),
+
+                          
+                          ],
+                        ),
+                      ),)
+                ]),
+
+
+                  const SizedBox(height: 65),
+
+                  // Título do carro e preço
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          offer["title"],
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF870989), // Destaque no título
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Text(
+                        "R\$ ${offer["price"]}",
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF870989), // Destaque no preço
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Divider(
+                    height: 20,
+                    thickness: 1,
+                    color: Color(0xFF870989), // Linha de divisão
+                  ),
+                  SizedBox(height: 20,),
+                  // Detalhes do carro
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        offer["details"],
+                        style: const TextStyle(
+                          fontSize: 20,
+                          color: Colors.purple,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+
+                      const SizedBox(height: 15),
+                    ],
+                  ),
+
+                ],
               ),
             ),
-            const SizedBox(height: 10),
-            Text(
-              offer["details"]!,
-              style: const TextStyle(fontSize: 16),
+          ),
+
+          // AppBar personalizada
+          Positioned(
+            top: 40, // Ajusta a altura da AppBar
+            left: 20,
+            right: 0,
+            child: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 20.0), // Mover a seta
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_back,
+                        color: Color(0xFF870989), size:32),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ),
+                SizedBox(width: 100,),
+                Column(
+                  children: [
+                    SizedBox(height: 20,),
+                      Text(
+                    offer["title"],
+                    style: const TextStyle(
+                      fontSize: 25,
+                      color: Color(0xFF870989),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Divider(height: 10,color: Color(0xFF870989),)
+                  
+                ]),
+                
+              
+                const Spacer(),
+              ],
             ),
-            const SizedBox(height: 10),
-            Text(
-              "R\$ ${offer["price"]}",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.purple[600],
-              ),
+          ),
+
+          // Fundo da AppBar para destacar
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 100, // Altura personalizada
+              color:  Colors.purple[30], // Cor do fundo
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
+
