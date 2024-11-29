@@ -345,7 +345,6 @@ class OfferDetailsScreen extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // Conteúdo principal da página
           SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.only(top: 120, left: 20, right: 20),
@@ -355,14 +354,14 @@ class OfferDetailsScreen extends StatelessWidget {
                   Row(
                   children: [
                                   SizedBox(
-                    height: 400, // Altura fixa
-                    width:800, // Largura ocupando todo o espaço disponível
+                    height: 400, 
+                    width:800,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: Image.network(
                         offer["image"],
                         fit: BoxFit
-                            .fill, // Faz a imagem preencher o espaço da SizedBox proporcionalmente
+                            .fill, 
                       ),
                     ),
                   ),
@@ -376,24 +375,24 @@ class OfferDetailsScreen extends StatelessWidget {
                           children: [
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.orange, // Cor de fundo do botão
+                                backgroundColor: Colors.orange, 
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(
-                                      30), // Borda arredondada
+                                      30), 
                                 ),
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 60,
-                                    vertical:25), // Padding do botão
+                                    vertical:25), 
                                 textStyle: const TextStyle(
-                                  fontSize: 22, // Tamanho do texto
-                                  fontWeight: FontWeight.bold, // Peso da fonte
+                                  fontSize: 22, 
+                                  fontWeight: FontWeight.bold, 
                                 ),
                               ),
                               onPressed: () {},
                               child: const Text(
-                                "Comprar", // Texto do botão
+                                "Comprar", 
                                 style: TextStyle(
-                                    color: Colors.white), // Cor do texto
+                                    color: Colors.white),
                               ),
                             ),
                             const SizedBox(height: 60),
@@ -402,25 +401,25 @@ class OfferDetailsScreen extends StatelessWidget {
                                   onPressed: () {},
                                   icon: const Icon(Icons.chat,
                                       color:
-                                          Color(0xFF870989)), // Ícone do botão
+                                          Color(0xFF870989)), 
                                   label: const Text(
-                                    "Chat", // Texto do botão
+                                    "Chat", 
                                     style: TextStyle(
-                                      color: Color(0xFF870989), // Cor do texto
-                                      fontSize: 16, // Tamanho do texto
+                                      color: Color(0xFF870989), 
+                                      fontSize: 16, 
                                     ),
                                   ),
                                   style: OutlinedButton.styleFrom(
                                     side: const BorderSide(
                                         color:
-                                            Color(0xFF870989)), // Cor da borda
+                                            Color(0xFF870989)),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(
-                                          30), // Borda arredondada
+                                          30), 
                                     ),
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 30,
-                                        vertical: 12), // Padding
+                                        vertical: 12), 
                                   ),
                                 ),
                                 const SizedBox(height: 20),
@@ -428,25 +427,25 @@ class OfferDetailsScreen extends StatelessWidget {
                                   onPressed: () {},
                                   icon: const Icon(Icons.favorite,
                                       color:
-                                          Color(0xFF870989)), // Ícone do botão
+                                          Color(0xFF870989)),
                                   label: const Text(
-                                    "Favoritar", // Texto do botão
+                                    "Favoritar", 
                                     style: TextStyle(
-                                      color: Color(0xFF870989), // Cor do texto
-                                      fontSize: 16, // Tamanho do texto
+                                      color: Color(0xFF870989), 
+                                      fontSize: 16, 
                                     ),
                                   ),
                                   style: OutlinedButton.styleFrom(
                                     side: const BorderSide(
                                         color:
-                                            Color(0xFF870989)), // Cor da borda
+                                            Color(0xFF870989)), 
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(
-                                          30), // Borda arredondada
+                                          30), 
                                     ),
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 30,
-                                        vertical: 12), // Padding
+                                        vertical: 12), 
                                   ),
                                 ),
 
@@ -459,7 +458,6 @@ class OfferDetailsScreen extends StatelessWidget {
 
                   const SizedBox(height: 65),
 
-                  // Título do carro e preço
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -469,7 +467,7 @@ class OfferDetailsScreen extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF870989), // Destaque no título
+                            color: Color(0xFF870989),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -480,7 +478,7 @@ class OfferDetailsScreen extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF870989), // Destaque no preço
+                          color: Color(0xFF870989), 
                         ),
                       ),
                     ],
@@ -488,10 +486,9 @@ class OfferDetailsScreen extends StatelessWidget {
                   const Divider(
                     height: 20,
                     thickness: 1,
-                    color: Color(0xFF870989), // Linha de divisão
+                    color: Color(0xFF870989), 
                   ),
                   SizedBox(height: 20,),
-                  // Detalhes do carro
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -513,15 +510,15 @@ class OfferDetailsScreen extends StatelessWidget {
             ),
           ),
 
-          // AppBar personalizada
+
           Positioned(
-            top: 40, // Ajusta a altura da AppBar
+            top: 40, 
             left: 20,
             right: 0,
             child: Row(
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(left: 20.0), // Mover a seta
+                  padding: const EdgeInsets.only(left: 20.0), 
                   child: IconButton(
                     icon: const Icon(Icons.arrow_back,
                         color: Color(0xFF870989), size:32),
@@ -550,14 +547,14 @@ class OfferDetailsScreen extends StatelessWidget {
             ),
           ),
 
-          // Fundo da AppBar para destacar
+
           Positioned(
             top: 0,
             left: 0,
             right: 0,
             child: Container(
-              height: 100, // Altura personalizada
-              color:  Colors.purple[30], // Cor do fundo
+              height: 100, 
+              color:  Colors.purple[30],
             ),
           ),
         ],
