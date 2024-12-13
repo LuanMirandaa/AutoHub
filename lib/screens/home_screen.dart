@@ -17,10 +17,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _minPriceController = TextEditingController();
   final TextEditingController _maxPriceController = TextEditingController();
 
-
-  String? _selectedState; 
+  String? _selectedState;
   final List<String> _selectedBrands = [];
-
 
   final List<Map<String, dynamic>> _offers = [
     {
@@ -51,7 +49,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<String> _brands = ["Honda", "Chevrolet", "Ford"];
 
-  
   List<Map<String, dynamic>> _filterOffers() {
     int? minPrice = int.tryParse(_minPriceController.text);
     int? maxPrice = int.tryParse(_maxPriceController.text);
@@ -83,6 +80,86 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void _showFiltersDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Filtros"),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Preço",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _minPriceController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(hintText: "Min"),
+                  onChanged: (value) => setState(() {}),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _maxPriceController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(hintText: "Max"),
+                  onChanged: (value) => setState(() {}),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  "Estado",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  children: ["Novo", "Usado", "Semi-novo"].map((state) {
+                    return ElevatedButton(
+                      onPressed: () => _selectState(state),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _selectedState == state
+                            ? Colors.purple
+                            : Colors.grey[300],
+                      ),
+                      child: Text(state,
+                          style: const TextStyle(color: Colors.white)),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  "Marcas",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  children: _selectedBrands.map((brand) {
+                    return Chip(
+                      label: Text(brand),
+                      deleteIcon: const Icon(Icons.close),
+                      onDeleted: () => _toggleBrand(brand),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text("Aplicar Filtros"),
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,241 +168,125 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text("Auto Hub"),
         backgroundColor: Colors.purple[30],
       ),
-      body: Row(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          
-          Container(
-            width: MediaQuery.of(context).size.width * 0.3,
-            height: double.infinity,
-            color: Colors.purple[30],
-            padding: const EdgeInsets.all(50),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Preço",
-                    style: TextStyle(
-                        color: Colors.purple, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: _minPriceController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      hintText: "Min",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Colors.purple),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Text(
+                      "Últimas ofertas",
+                      style: TextStyle(
+                        color: Colors.purple,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    onChanged: (value) => setState(() {}),
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: _maxPriceController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      hintText: "Max",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Colors.purple),
+                    const SizedBox(width: 10),
+                    ElevatedButton(
+                      onPressed: _showFiltersDialog,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.purple,
                       ),
+                      child: const Text("Filtros"),
                     ),
-                    onChanged: (value) => setState(() {}),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    "Estado",
-                    style: TextStyle(
-                        color: Colors.purple, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () => _selectState("Novo"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _selectedState == "Novo"
-                          ? Colors.purple
-                          : Colors.grey[300],
-                    ),
-                    child: const Text("Novo",
-                        style: TextStyle(color: Colors.white)),
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () => _selectState("Usado"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _selectedState == "Usado"
-                          ? Colors.purple
-                          : Colors.grey[300],
-                    ),
-                    child: const Text("Usado",
-                        style: TextStyle(color: Colors.white)),
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () => _selectState("Semi-novo"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _selectedState == "Semi-novo"
-                          ? Colors.purple
-                          : Colors.grey[300],
-                    ),
-                    child: const Text("Semi-novo",
-                        style: TextStyle(color: Colors.white)),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    "Marcas",
-                    style: TextStyle(
-                        color: Colors.purple, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 8,
-                    children: _selectedBrands.map((brand) {
-                      return Chip(
-                        label: Text(brand),
-                        backgroundColor: Colors.purple[50],
-                        labelStyle: const TextStyle(color: Colors.purple),
-                        deleteIcon:
-                            const Icon(Icons.close, color: Colors.purple),
-                        onDeleted: () => _toggleBrand(brand),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 10),
-                  GestureDetector(
-                    onTap: () {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: _brands.map((brand) {
-                              return ListTile(
-                                title: Text(brand),
-                                trailing: _selectedBrands.contains(brand)
-                                    ? const Icon(Icons.check,
-                                        color: Colors.purple)
-                                    : null,
-                                onTap: () {
-                                  Navigator.pop(context); 
-                                  _toggleBrand(
-                                      brand);
-                                },
-                              );
-                            }).toList(),
-                          );
-                        },
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.purple[50],
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
-                          Text(
-                            "Selecionar Marcas",
-                            style: TextStyle(color: Colors.purple),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+              ],
             ),
           ),
+          const Divider(color: Colors.purple),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(25),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const Text(
-                    "Últimas ofertas",
-                    style: TextStyle(
-                      color: Colors.purple,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final crossAxisCount = constraints.maxWidth < 600 ? 2 : 4;
+                return GridView.builder(
+                  padding: const EdgeInsets.all(10),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    childAspectRatio: 3 / 2,
                   ),
-                  const Divider(color: Colors.purple),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: _filterOffers().length,
-                      itemBuilder: (context, index) {
-                        final offer = _filterOffers()[index];
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    OfferDetailsScreen(offer: offer),
-                              ),
-                            );
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.only(bottom: 10),
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: const Color(0x45AD0E7D), width: 4),
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.white,
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: 120,
-                                  height: 80,
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      image: NetworkImage(offer["image"]!),
-                                      fit: BoxFit.cover,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                const SizedBox(width: 15),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      offer["title"]!,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.purple,
-                                      ),
-                                    ),
-                                    Text(offer["details"]!),
-                                    const SizedBox(height: 5),
-                                    Text(
-                                      "R\$ ${offer["price"]}",
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.purple[600],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                  itemCount: _filterOffers().length,
+                  itemBuilder: (context, index) {
+                    final offer = _filterOffers()[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                OfferDetailsScreen(offer: offer),
                           ),
                         );
                       },
-                    ),
-                  ),
-                ],
-              ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                              color: const Color(0x45AD0E7D), width: 4),
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.white,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: NetworkImage(offer["image"]!),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(8)),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    offer["title"]!,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.purple,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    offer["details"]!,
+                                    style: const TextStyle(fontSize: 12),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 5),
+                                  Text(
+                                    "${offer["price"]}",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.purple[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
             ),
           ),
         ],
@@ -333,8 +294,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
-
 
 class OfferDetailsScreen extends StatelessWidget {
   final Map<String, dynamic> offer;
@@ -352,209 +311,51 @@ class OfferDetailsScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                  children: [
-                                  SizedBox(
-                    height: 400, 
-                    width:800,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.network(
-                        offer["image"],
-                        fit: BoxFit
-                            .fill, 
+                    children: [
+                      SizedBox(
+                        width: 150,
+                        height: 150,
+                        child: Image.network(
+                          offer["image"]!,
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                    ),
-                  ),
-                  SizedBox(width:MediaQuery.of(context).size.width * 0.2 ,),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Container(
-                        color: Colors.purple[30],
+                      const SizedBox(width: 10),
+                      Expanded(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.orange, 
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      30), 
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 60,
-                                    vertical:25), 
-                                textStyle: const TextStyle(
-                                  fontSize: 22, 
-                                  fontWeight: FontWeight.bold, 
-                                ),
-                              ),
-                              onPressed: () {},
-                              child: const Text(
-                                "Comprar", 
-                                style: TextStyle(
-                                    color: Colors.white),
+                            Text(
+                              offer["title"]!,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(height: 60),
-
-                                OutlinedButton.icon(
-                                  onPressed: () {},
-                                  icon: const Icon(Icons.chat,
-                                      color:
-                                          Color(0xFF870989)), 
-                                  label: const Text(
-                                    "Chat", 
-                                    style: TextStyle(
-                                      color: Color(0xFF870989), 
-                                      fontSize: 16, 
-                                    ),
-                                  ),
-                                  style: OutlinedButton.styleFrom(
-                                    side: const BorderSide(
-                                        color:
-                                            Color(0xFF870989)),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                          30), 
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 30,
-                                        vertical: 12), 
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                                OutlinedButton.icon(
-                                  onPressed: () {},
-                                  icon: const Icon(Icons.favorite,
-                                      color:
-                                          Color(0xFF870989)),
-                                  label: const Text(
-                                    "Favoritar", 
-                                    style: TextStyle(
-                                      color: Color(0xFF870989), 
-                                      fontSize: 16, 
-                                    ),
-                                  ),
-                                  style: OutlinedButton.styleFrom(
-                                    side: const BorderSide(
-                                        color:
-                                            Color(0xFF870989)), 
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                          30), 
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 30,
-                                        vertical: 12), 
-                                  ),
-                                ),
-
-                          
+                            Text(offer["details"]!),
                           ],
                         ),
-                      ),)
-                ]),
-
-
-                  const SizedBox(height: 65),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          offer["title"],
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF870989),
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Text(
-                        "R\$ ${offer["price"]}",
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF870989), 
-                        ),
                       ),
                     ],
                   ),
-                  const Divider(
-                    height: 20,
-                    thickness: 1,
-                    color: Color(0xFF870989), 
+                  const SizedBox(height: 20),
+                  Text(
+                    "Preço: ${offer["price"]}",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  SizedBox(height: 20,),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        offer["details"],
-                        style: const TextStyle(
-                          fontSize: 20,
-                          color: Colors.purple,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-
-                      const SizedBox(height: 15),
-                    ],
-                  ),
-
                 ],
               ),
             ),
           ),
-
-
           Positioned(
-            top: 40, 
+            top: 50,
             left: 20,
-            right: 0,
-            child: Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 20.0), 
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back,
-                        color: Color(0xFF870989), size:32),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ),
-                SizedBox(width: 100,),
-                Column(
-                  children: [
-                    SizedBox(height: 20,),
-                      Text(
-                    offer["title"],
-                    style: const TextStyle(
-                      fontSize: 25,
-                      color: Color(0xFF870989),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Divider(height: 10,color: Color(0xFF870989),)
-                  
-                ]),
-                
-              
-                const Spacer(),
-              ],
-            ),
-          ),
-
-
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 100, 
-              color:  Colors.purple[30],
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back, size: 30),
+              onPressed: () => Navigator.pop(context),
             ),
           ),
         ],
@@ -562,4 +363,3 @@ class OfferDetailsScreen extends StatelessWidget {
     );
   }
 }
-
