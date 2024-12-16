@@ -14,6 +14,10 @@ class AuthService {
           return 'Usuário não cadastrado';
         case 'wrong-password':
           return 'Senha incorreta';
+        case 'invalid-email':
+          return 'Email inválido';
+        case 'missing-password':
+          return 'Senha incorreta';
       }
       return e.code;
     }
