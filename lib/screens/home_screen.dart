@@ -115,7 +115,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 10),
                 Wrap(
-                  spacing: 8,
+                  direction: Axis.vertical,
+                  spacing: 12,
                   children: ["Novo", "Usado", "Semi-novo"].map((state) {
                     return ElevatedButton(
                       onPressed: () => _selectState(state),
@@ -124,8 +125,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             ? Colors.purple
                             : Colors.grey[300],
                       ),
-                      child: Text(state,
-                          style: const TextStyle(color: Colors.white)),
+                      child: Text(
+                        state,
+                        style: TextStyle(
+                          color: _selectedState == state
+                              ? Colors.white
+                              : Colors.purple,
+                        ),
+                      ),
                     );
                   }).toList(),
                 ),
@@ -190,9 +197,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     ElevatedButton(
                       onPressed: _showFiltersDialog,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.purple,
+                        backgroundColor: Colors.orange,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+
                       ),
-                      child: const Text("Filtros"),
+                      child: const Text("Filtros",
+                          style: TextStyle(color: Colors.white)),
                     ),
                   ],
                 ),
@@ -311,51 +323,114 @@ class OfferDetailsScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    children: [
+                    children: [Center(
+                      child:
                       SizedBox(
-                        width: 150,
-                        height: 150,
-                        child: Image.network(
-                          offer["image"]!,
-                          fit: BoxFit.cover,
+                        width: MediaQuery.of(context).size.width * 0.8 ,
+                        height: MediaQuery.of(context).size.height * 0.5,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.network(
+                            offer["image"],
+                            fit: BoxFit.fill,
+                          ),
                         ),
                       ),
-                      const SizedBox(width: 10),
+                    )
+
+
+
+                    ],
+                  ),
+                  const SizedBox(height: 65),
+
+                  Row(
+                    children: [
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              offer["title"]!,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(offer["details"]!),
-                          ],
+                        child: Text(
+                          offer["title"],
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF870989),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Text(
+                        "R\$ ${offer["price"]}",
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF870989),
                         ),
                       ),
                     ],
                   ),
+                  const Divider(
+                    height: 20,
+                    thickness: 1,
+                    color: Color(0xFF870989),
+                  ),
                   const SizedBox(height: 20),
+
+
                   Text(
-                    "Preço: ${offer["price"]}",
+                    offer["details"],
                     style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: Colors.purple,
                     ),
                   ),
+                  const SizedBox(height: 15),
                 ],
               ),
             ),
           ),
+
           Positioned(
-            top: 50,
+            top: 40,
             left: 20,
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back, size: 30),
-              onPressed: () => Navigator.pop(context),
+            right: 0,
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back,
+                      color: Color(0xFF870989), size: 32),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                SizedBox(width: 100),
+                Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    Text(
+                      offer["title"],
+                      style: const TextStyle(
+                        fontSize: 25,
+                        color: Color(0xFF870989),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Divider(
+                      height: 10,
+                      color: Color(0xFF870989),
+                    )
+                  ],
+                ),
+                const Spacer(),
+              ],
+            ),
+          ),
+
+
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 100,
+              color: Colors.purple[30],
             ),
           ),
         ],
@@ -363,3 +438,4 @@ class OfferDetailsScreen extends StatelessWidget {
     );
   }
 }
+
