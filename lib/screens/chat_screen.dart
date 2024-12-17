@@ -13,27 +13,44 @@ class MyChatsScreen extends StatefulWidget {
 
 class __MyChatsScreenState extends State<MyChatsScreen> {
   final textController = TextEditingController();
+  final CollectionReference _messages =
+      FirebaseFirestore.instance.collection("messages");
+  final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+  final String currentUserName =
+      FirebaseAuth.instance.currentUser!.displayName!;
+  String? _editingMessageId;
 
   String currentMessage = "";
 
-  Future<void> getMessages() async {
-    //   final messagesSnapshot =
-    //   await FirebaseFirestore.instance.collection("messages").get();
-    //   setState(() {
-    //     messages.clear();
-    //     for (final message in messagesSnapshot.docs) {
-    //       messages.add(message["message"]);
-    //     }
-    //   });
+  void _sendMessage() async {
+    if (textController.text.trim().isEmpty) return;
+
+    if (_editingMessageId == null) {
+      await _messages.add({
+        'text': textController.text,
+        'senderId': currentUserId,
+        'senderName': currentUserName,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    } else {
+      await _messages.doc(_editingMessageId).update({
+        'text': textController.text,
+      });
+      _editingMessageId = null;
+    }
+
+    textController.clear();
   }
 
-  Future<void> addMessage(String message) async {
-    await FirebaseFirestore.instance
-        .collection("messages")
-        .add({"message": message});
-    // setState(() {
-    //   messages.add(message);
-    // });
+  void _deleteMessage(String messageId) async {
+    await _messages.doc(messageId).delete();
+  }
+
+  void _editMessage(String messageId, String currentText) {
+    setState(() {
+      _editingMessageId = messageId;
+      textController.text = currentText;
+    });
   }
 
   Stream<List<String>> messagesStream() {
@@ -48,53 +65,112 @@ class __MyChatsScreenState extends State<MyChatsScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    getMessages();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
+      //resizeToAvoidBottomInset: true,
       drawer: (Menu(user: widget.user)),
       appBar: AppBar(
-        title: const Text('Minhas Conversas'),
+        title: const Text('Conversas'),
       ),
-      body: StreamBuilder<List<String>>(
-          stream: messagesStream(),
-          builder: (context, snapshot) {
-            final messages = snapshot.data ?? [];
-            return ListView.builder(
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(messages[index]),
+      body: Column(
+        children: [
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream:
+                  _messages.orderBy('timestamp', descending: true).snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final messages = snapshot.data?.docs ?? [];
+
+                return ListView.builder(
+                  reverse: true,
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    final message = messages[index];
+                    final messageId = message.id;
+                    final messageData = message.data() as Map<String, dynamic>;
+                    final isMine = messageData['senderId'] == currentUserId;
+
+                    return Container(
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 4, horizontal: 8),
+                      alignment:
+                          isMine ? Alignment.centerRight : Alignment.centerLeft,
+                      child: Column(
+                        crossAxisAlignment: isMine
+                            ? CrossAxisAlignment.end
+                            : CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            messageData['senderName'] ?? 'Desconhecido',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color:
+                                  isMine ? Colors.blue[100] : Colors.grey[300],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              messageData['text'] ?? '',
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ),
+                          if (isMine)
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.edit,
+                                      color: Colors.green),
+                                  onPressed: () => _editMessage(
+                                      messageId, messageData['text']),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete,
+                                      color: Colors.red),
+                                  onPressed: () => _deleteMessage(messageId),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
+                    );
+                  },
                 );
               },
-            );
-          }),
-      bottomSheet: SizedBox(
-        height: 50,
-        child: Row(
-          children: [
-            Expanded(
-                child: TextField(
-              controller: textController,
-              onChanged: (value) {
-                currentMessage = value;
-              },
-            )),
-            IconButton(
-                onPressed: () {
-                  if (currentMessage.isNotEmpty) {
-                    textController.clear();
-                    addMessage(currentMessage);
-                  }
-                },
-                icon: const Icon(Icons.send))
-          ],
-        ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: textController,
+                    decoration: const InputDecoration(
+                      labelText: 'Digite sua mensagem...',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  onPressed: _sendMessage,
+                  icon: const Icon(Icons.send, color: Colors.blue),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

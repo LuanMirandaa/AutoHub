@@ -52,7 +52,7 @@ class Menu extends StatelessWidget {
 
           ),
           ListTile(leading: const Icon(Icons.chat_bubble),
-            title: const Text('Minhas Conversas'),
+            title: const Text('Conversas'),
             onTap: () {
               Navigator.pushReplacement(
                 context,
