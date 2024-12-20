@@ -7,7 +7,8 @@ class LoginScreen extends StatelessWidget {
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _senhaController = TextEditingController();
-  AuthService authService = AuthService();
+  final AuthService authService = AuthService();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,8 +18,8 @@ class LoginScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: EdgeInsets.all(20),
-              margin: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
+              margin: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                   color: Colors.white, borderRadius: BorderRadius.circular(8)),
               child: Column(
@@ -30,57 +31,52 @@ class LoginScreen extends StatelessWidget {
                   ),
                   TextField(
                     controller: _emailController,
-                    decoration: InputDecoration(hintText: 'E-mail'),
+                    decoration: const InputDecoration(hintText: 'E-mail'),
                   ),
-                  SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
                   TextField(
-                      obscureText: true,
-                      controller: _senhaController,
-                      decoration: InputDecoration(hintText: 'Senha')),
-                  SizedBox(
-                    height: 20,
+                    obscureText: true,
+                    controller: _senhaController,
+                    decoration: const InputDecoration(hintText: 'Senha'),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ElevatedButton(
-                      onPressed: () {
-                        authService
-                            .entrarUsuario(
-                                email: _emailController.text,
-                                senha: _senhaController.text)
-                            .then((String? erro) {
-                          if (erro != null) {
-                            final snackBar = SnackBar(content: Text(erro),backgroundColor: Colors.red);
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(snackBar);
-                          }
-                        });
-                      },
-                      child: Text('Entrar')),
-                  SizedBox(
-                    height: 20,
+                    onPressed: () async {
+                      // Evitar o uso do BuildContext diretamente
+                      final erro = await authService.entrarUsuario(
+                        email: _emailController.text,
+                        senha: _senhaController.text,
+                      );
+                      if (context.mounted && erro != null) {
+                        final snackBar = SnackBar(
+                          content: Text(erro),
+                          backgroundColor: Colors.red,
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      }
+                    },
+                    child: const Text('Entrar'),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ElevatedButton(
-                      onPressed: () {}, child: Text('Entrar com o Google')),
-                  SizedBox(
-                    height: 20,
+                    onPressed: () {}, 
+                    child: const Text('Entrar com o Google'),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => RegisterScreen(),
-                          ));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RegisterScreen(),
+                        ),
+                      );
                     },
-                    child: Text('Cadastrar-se'),
-                  )
+                    child: const Text('Cadastrar-se'),
+                  ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
