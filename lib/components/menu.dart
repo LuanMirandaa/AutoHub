@@ -24,8 +24,8 @@ class Menu extends StatelessWidget {
                 size: 50,
               ),
             ),
-            accountName: Text(user.displayName ?? ''),
-            accountEmail: Text(user.email ?? ''),
+            accountName: Text(user.displayName ?? 'Usuário'),
+            accountEmail: Text(user.email ?? 'E-mail não disponível'),
           ),
           ListTile(
             leading: const Icon(Icons.home_max_rounded),
@@ -39,7 +39,8 @@ class Menu extends StatelessWidget {
               );
             },
           ),
-          ListTile(leading: const Icon(Icons.apps_rounded),
+          ListTile(
+            leading: const Icon(Icons.apps_rounded),
             title: const Text('Seus anúncios'),
             onTap: () {
               Navigator.pushReplacement(
@@ -49,9 +50,9 @@ class Menu extends StatelessWidget {
                 ),
               );
             },
-
           ),
-          ListTile(leading: const Icon(Icons.chat_bubble),
+          ListTile(
+            leading: const Icon(Icons.chat_bubble),
             title: const Text('Conversas'),
             onTap: () {
               Navigator.pushReplacement(
@@ -61,18 +62,18 @@ class Menu extends StatelessWidget {
                 ),
               );
             },
-
           ),
           ListTile(
             leading: const Icon(Icons.exit_to_app_rounded),
             title: const Text('Sair'),
             onTap: () async {
               await AuthService().deslogar();
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => LoginScreen()),
-                
-              );
+              if (context.mounted) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
+              }
             },
           ),
         ],
