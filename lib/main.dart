@@ -1,5 +1,4 @@
 import 'package:auto_hub/screens/home_screen.dart';
-//import 'package:auto_hub/screens/my_announcements_screen.dart';
 import 'package:auto_hub/screens/login_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +19,7 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
   
-  // This widget is the root of your application.
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
