@@ -174,4 +174,8 @@ class __MyChatsScreenState extends State<MyChatsScreen> {
       ),
     );
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 5065bb2c6c47a97f97a3646b9285333ef13db456
