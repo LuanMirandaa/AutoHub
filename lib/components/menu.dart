@@ -1,3 +1,4 @@
+import 'package:auto_hub/screens/chat_screen.dart';
 import 'package:auto_hub/screens/home_screen.dart';
 import 'package:auto_hub/screens/login_screen.dart';
 import 'package:auto_hub/screens/my_announcements_screen.dart';
@@ -50,15 +51,27 @@ class Menu extends StatelessWidget {
             },
 
           ),
+          ListTile(leading: const Icon(Icons.chat_bubble),
+            title: const Text('Minhas Conversas'),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyChatsScreen(user: user),
+                ),
+              );
+            },
+
+          ),
           ListTile(
             leading: const Icon(Icons.exit_to_app_rounded),
             title: const Text('Sair'),
             onTap: () async {
               await AuthService().deslogar();
-              Navigator.pushAndRemoveUntil(
+              Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => LoginScreen()),
-                (route) => false,
+                
               );
             },
           ),
