@@ -55,10 +55,10 @@ class Menu extends StatelessWidget {
             title: const Text('Sair'),
             onTap: () async {
               await AuthService().deslogar();
-              Navigator.pushAndRemoveUntil(
+              Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => LoginScreen()),
-                (route) => false,
+                
               );
             },
           ),
