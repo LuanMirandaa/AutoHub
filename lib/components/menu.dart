@@ -1,5 +1,7 @@
+import 'package:auto_hub/screens/chat_screen.dart';
 import 'package:auto_hub/screens/home_screen.dart';
 import 'package:auto_hub/screens/login_screen.dart';
+import 'package:auto_hub/screens/perfil_screen.dart';
 import 'package:auto_hub/screens/my_announcements_screen.dart';
 import 'package:auto_hub/services/auth_services.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +40,8 @@ class Menu extends StatelessWidget {
               );
             },
           ),
-          ListTile(leading: const Icon(Icons.apps_rounded),
+          ListTile(
+            leading: const Icon(Icons.apps_rounded),
             title: const Text('Seus anúncios'),
             onTap: () {
               Navigator.pushReplacement(
@@ -48,7 +51,31 @@ class Menu extends StatelessWidget {
                 ),
               );
             },
-
+          ),
+          ListTile(
+            leading: const Icon(Icons.chat_bubble),
+            title: const Text('Minhas Conversas'),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyChatsScreen(user: user),
+                ),
+              );
+            },
+          ),
+                    ListTile(
+            leading: const Icon(Icons.person),
+            title: const Text('Perfil'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      ProfileScreen( user: user),
+                ),
+              );
+            },
           ),
           ListTile(
             leading: const Icon(Icons.exit_to_app_rounded),
@@ -58,7 +85,6 @@ class Menu extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => LoginScreen()),
-                
               );
             },
           ),

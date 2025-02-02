@@ -170,10 +170,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       drawer: Menu(user: widget.user),
       appBar: AppBar(
         title: const Text("Auto Hub"),
-        backgroundColor: Colors.purple[30],
+        titleTextStyle: TextStyle(
+          color: Colors.purple,fontSize: 20),
+        backgroundColor: Colors.white,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
