@@ -1,7 +1,9 @@
-import 'package:auto_hub/components/menu.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:auto_hub/helpers/format_number.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:auto_hub/models/cars.dart';
+import 'package:auto_hub/components/menu.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomeScreen extends StatefulWidget {
   final User user;
@@ -12,56 +14,82 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  List<Car> listCars = [];
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+  bool isLoading = true;
 
-  final TextEditingController _minPriceController = TextEditingController();
-  final TextEditingController _maxPriceController = TextEditingController();
 
+  TextEditingController _minPriceController = TextEditingController();
+  TextEditingController _maxPriceController = TextEditingController();
   String? _selectedState;
-  final List<String> _selectedBrands = [];
+  List<String> _selectedBrands = [];
+  TextEditingController _searchController =
+      TextEditingController();
 
-  final List<Map<String, dynamic>> _offers = [
-    {
-      "price": 132580,
-      "title": "Honda Civic - Type R",
-      "details": "37000 Km\n2.0\nPE - Recife",
-      "brand": "Honda",
-      "state": "Novo",
-      "image": "assets/images/image 156.png"
-    },
-    {
-      "price": 45900,
-      "title": "Chevrolet Corsa",
-      "details": "120000 Km\n1.4\nSP - São Paulo",
-      "brand": "Chevrolet",
-      "state": "Usado",
-      "image": "https://via.placeholder.com/150"
-    },
-    {
-      "price": 78300,
-      "title": "Ford EcoSport",
-      "details": "80000 Km\n2.0\nRJ - Rio de Janeiro",
-      "brand": "Ford",
-      "state": "Semi-novo",
-      "image": "https://via.placeholder.com/150"
-    },
-  ];
+  int _crossAxisCount = 2;
 
-  final List<String> _brands = ["Honda", "Chevrolet", "Ford"];
+  @override
+  void initState() {
+    super.initState();
+    refresh();
+  }
 
-  List<Map<String, dynamic>> _filterOffers() {
-    int? minPrice = int.tryParse(_minPriceController.text);
-    int? maxPrice = int.tryParse(_maxPriceController.text);
+  Future<void> refresh() async {
+    List<Car> temp = [];
+    try {
+      QuerySnapshot<Map<String, dynamic>> snapshot =
+          await firestore.collection('Anúncios').get();
+      for (var doc in snapshot.docs) {
+        Car car = Car.fromMap(doc.data());
+        if (car.userId != widget.user.uid) {
+          temp.add(car);
+        }
+      }
+    } catch (e) {
+      print('Erro ao carregar anúncios: $e');
+    }
+    setState(() {
+      listCars = temp;
+      isLoading = false;
+    });
+  }
 
-    return _offers.where((offer) {
-      bool matchesState =
-          _selectedState == null || offer["state"] == _selectedState;
-      bool matchesBrand =
-          _selectedBrands.isEmpty || _selectedBrands.contains(offer["brand"]);
-      bool matchesMin = minPrice == null || offer["price"] >= minPrice;
-      bool matchesMax = maxPrice == null || offer["price"] <= maxPrice;
-      return matchesState && matchesBrand && matchesMin && matchesMax;
-    }).toList();
+  List<Car> _filterCars() {
+    List<Car> filteredList = listCars;
+
+    if (_minPriceController.text.isNotEmpty) {
+      int minPrice = int.tryParse(_minPriceController.text) ?? 0;
+      filteredList =
+          filteredList.where((car) => car.preco >= minPrice).toList();
+    }
+
+    if (_maxPriceController.text.isNotEmpty) {
+      int maxPrice = int.tryParse(_maxPriceController.text) ?? 9999999999;
+      filteredList =
+          filteredList.where((car) => car.preco <= maxPrice).toList();
+    }
+
+    if (_selectedState != null) {
+      filteredList =
+          filteredList.where((car) => car.descricao == _selectedState).toList();
+    }
+
+    if (_selectedBrands.isNotEmpty) {
+      filteredList = filteredList
+          .where((car) => _selectedBrands.contains(car.marca))
+          .toList();
+    }
+
+
+    if (_searchController.text.isNotEmpty) {
+      filteredList = filteredList
+          .where((car) => car.modelo
+              .toLowerCase()
+              .contains(_searchController.text.toLowerCase()))
+          .toList();
+    }
+
+    return filteredList;
   }
 
   void _selectState(String state) {
@@ -80,87 +108,96 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _showFiltersDialog() {
-    showDialog(
+void _showFiltersDialog() {
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Filtros"),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Preço",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize:
+                MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Filtros",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                "Preço",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: _minPriceController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  hintText: "Min",
+                  border: OutlineInputBorder(),
                 ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: _minPriceController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(hintText: "Min"),
-                  onChanged: (value) => setState(() {}),
+                onChanged: (value) => setState(() {}),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: _maxPriceController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  hintText: "Max",
+                  border: OutlineInputBorder(),
                 ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: _maxPriceController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(hintText: "Max"),
-                  onChanged: (value) => setState(() {}),
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  "Estado",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-                Wrap(
-                  direction: Axis.vertical,
-                  spacing: 12,
-                  children: ["Novo", "Usado", "Semi-novo"].map((state) {
-                    return ElevatedButton(
-                      onPressed: () => _selectState(state),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _selectedState == state
-                            ? Colors.purple
-                            : Colors.grey[300],
+                onChanged: (value) => setState(() {}),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                "Marcas",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8,
+                children: ["Honda", "Chevrolet", "Ford"].map((brand) {
+                  return ElevatedButton(
+                    onPressed: () => _toggleBrand(brand),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _selectedBrands.contains(brand)
+                          ? Colors.purple
+                          : Colors.grey[300],
+                    ),
+                    child: Text(
+                      brand,
+                      style: TextStyle(
+                        color: _selectedBrands.contains(brand)
+                            ? Colors.white
+                            : Colors.purple,
                       ),
-                      child: Text(
-                        state,
-                        style: TextStyle(
-                          color: _selectedState == state
-                              ? Colors.white
-                              : Colors.purple,
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  refresh();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  minimumSize: const Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
-                const SizedBox(height: 20),
-                const Text(
-                  "Marcas",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                child: const Text(
+                  "Aplicar Filtros",
+                  style: TextStyle(color: Colors.white),
                 ),
-                const SizedBox(height: 10),
-                Wrap(
-                  spacing: 8,
-                  children: _selectedBrands.map((brand) {
-                    return Chip(
-                      label: Text(brand),
-                      deleteIcon: const Icon(Icons.close),
-                      onDeleted: () => _toggleBrand(brand),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text("Aplicar Filtros"),
-                )
-              ],
-            ),
+              ),
+            ],
           ),
         );
       },
@@ -169,276 +206,260 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<Car> filteredCars = _filterCars();
+
     return Scaffold(
-      backgroundColor: Colors.white,
       drawer: Menu(user: widget.user),
       appBar: AppBar(
-        title: const Text("Auto Hub"),
-        titleTextStyle: TextStyle(
-          color: Colors.purple,fontSize: 20),
+        title: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Pesquisar por modelo...',
+                  border: InputBorder.none,
+                  hintStyle: TextStyle(color: Colors.grey),
+                ),
+                style: TextStyle(color: Colors.black),
+                onChanged: (value) {
+                  setState(() {});
+                },
+              ),
+            ),
+            const SizedBox(width: 10),
+            ElevatedButton(
+              onPressed: _showFiltersDialog,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: const Text(
+                "Filtros",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
         backgroundColor: Colors.white,
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    const Text(
-                      "Últimas ofertas",
-                      style: TextStyle(
-                        color: Colors.purple,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+      body: Container(
+        color: Colors.white,
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : filteredCars.isEmpty
+                ? Center(
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      width: 250,
+                      height: 250,
                     ),
-                    const SizedBox(width: 10),
-                    ElevatedButton(
-                      onPressed: _showFiltersDialog,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-
-                      ),
-                      child: const Text("Filtros",
-                          style: TextStyle(color: Colors.white)),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const Divider(color: Colors.purple),
-          Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final crossAxisCount = constraints.maxWidth < 600 ? 2 : 4;
-                return GridView.builder(
-                  padding: const EdgeInsets.all(10),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: crossAxisCount,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    childAspectRatio: 3 / 2,
-                  ),
-                  itemCount: _filterOffers().length,
-                  itemBuilder: (context, index) {
-                    final offer = _filterOffers()[index];
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                OfferDetailsScreen(offer: offer),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                              color: const Color(0x45AD0E7D), width: 4),
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: NetworkImage(offer["image"]!),
-                                    fit: BoxFit.cover,
-                                  ),
-                                  borderRadius: const BorderRadius.vertical(
-                                      top: Radius.circular(8)),
-                                ),
-                              ),
+                  )
+                : ListView.builder(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    itemCount: filteredCars.length,
+                    itemBuilder: (context, index) {
+                      Car model = filteredCars[index];
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  OfferDetailsScreen(car: model),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
+                          );
+                        },
+                        child: Card(
+                          elevation: 5,
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            side: BorderSide(
+                                color: Colors.purple.shade200, width: 4),
+                          ),
+                          child: InkWell(
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                color: Colors.white,
+                              ),
+                              child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    offer["title"]!,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.purple,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  Text(
-                                    offer["details"]!,
-                                    style: const TextStyle(fontSize: 12),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 5),
-                                  Text(
-                                    "${offer["price"]}",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.purple[600],
+                                  model.imageUrl != null
+                                      ? Image.network(
+                                          model.imageUrl!,
+                                          width: 160,
+                                          height: 120,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : const Icon(
+                                          Icons.image,
+                                          size: 64,
+                                          color: Colors.grey,
+                                        ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Modelo: ${model.modelo}',
+                                          style: const TextStyle(
+                                            color: Colors.purple,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Marca: ${model.marca}',
+                                          style: const TextStyle(
+                                            color: Colors.black87,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Quilometragem: ${formatNumber(model.quilometragem)} Km',
+                                          style: const TextStyle(
+                                            color: Colors.black87,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        SizedBox(height: 20),
+                                        Text(
+                                          'Preço: ${formatNumber(model.preco)} R\$',
+                                          style: const TextStyle(
+                                            color: Colors.purple,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-        ],
+                      );
+                    },
+                  ),
       ),
     );
   }
 }
 
 class OfferDetailsScreen extends StatelessWidget {
-  final Map<String, dynamic> offer;
-  const OfferDetailsScreen({super.key, required this.offer});
+  final Car car;
+  const OfferDetailsScreen({super.key, required this.car});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 120, left: 20, right: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [Center(
-                      child:
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.8 ,
-                        height: MediaQuery.of(context).size.height * 0.5,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Image.network(
-                            offer["image"],
-                            fit: BoxFit.fill,
-                          ),
-                        ),
-                      ),
-                    )
-
-
-
-                    ],
-                  ),
-                  const SizedBox(height: 65),
-
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          offer["title"],
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF870989),
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Text(
-                        "R\$ ${offer["price"]}",
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF870989),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Divider(
-                    height: 20,
-                    thickness: 1,
-                    color: Color(0xFF870989),
-                  ),
-                  const SizedBox(height: 20),
-
-
-                  Text(
-                    offer["details"],
-                    style: const TextStyle(
-                      fontSize: 20,
-                      color: Colors.purple,
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                ],
+      appBar: AppBar(
+        title: const Text('Detalhes do Anúncio'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.purple.shade200, width: 3),
+              ),
+              child: car.imageUrl != null
+                  ? Image.network(car.imageUrl!,
+                      width: 400, height: 250, fit: BoxFit.cover)
+                  : const Icon(Icons.image, size: 250, color: Colors.grey),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              margin: const EdgeInsets.only(left: 20),
+              child: Text(
+                '${car.modelo} - ',
+                style: TextStyle(
+                    color: Color(0xFF9A007E),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24),
               ),
             ),
-          ),
-
-          Positioned(
-            top: 40,
-            left: 20,
-            right: 0,
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back,
-                      color: Color(0xFF870989), size: 32),
-                  onPressed: () => Navigator.pop(context),
-                ),
-                SizedBox(width: 100),
-                Column(
-                  children: [
-                    const SizedBox(height: 20),
-                    Text(
-                      offer["title"],
-                      style: const TextStyle(
-                        fontSize: 25,
-                        color: Color(0xFF870989),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const Divider(
-                      height: 10,
-                      color: Color(0xFF870989),
-                    )
-                  ],
-                ),
-                const Spacer(),
-              ],
+            Divider(
+              color: Color(0xFF9A007E),
+              thickness: 2,
             ),
-          ),
-
-
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 100,
-              color: Colors.purple[30],
+            Container(
+              padding: const EdgeInsets.all(5),
+              margin: const EdgeInsets.only(bottom: 8, top: 18),
+              decoration: BoxDecoration(
+                color: Color(0x4C935DCA),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Text(
+                'R\$ ${formatNumber(car.preco)}',
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF740376),
+                ),
+              ),
             ),
-          ),
-        ],
+            Container(
+              padding: const EdgeInsets.all(5),
+              margin: const EdgeInsets.only(top: 12, bottom: 8),
+              decoration: BoxDecoration(
+                color: Color(0x72D999CD),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Text(
+                'Marca: ${car.marca}',
+                style: const TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF9A007E),
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(12),
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: Color(0x72D999CD),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Text(
+                'Quilometragem: ${formatNumber(car.quilometragem)} Km',
+                style: const TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF9A007E),
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Color(0x72D999CD),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Text(
+                'Descrição: ${car.descricao ?? "Nenhuma descrição disponível."}',
+                style: const TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF9A007E),
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-

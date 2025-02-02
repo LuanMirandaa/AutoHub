@@ -1,13 +1,18 @@
 import 'dart:typed_data';
+import 'dart:convert';
+import 'dart:io';
 import 'package:auto_hub/components/menu.dart';
 import 'package:auto_hub/models/cars.dart';
+import 'package:auto_hub/helpers/format_number.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:uuid/uuid.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+import 'package:uuid/uuid.dart';
 
 class MyAnnouncementsScreen extends StatefulWidget {
   final User user;
@@ -15,6 +20,35 @@ class MyAnnouncementsScreen extends StatefulWidget {
 
   @override
   State<MyAnnouncementsScreen> createState() => _MyAnnouncementsScreenState();
+}
+
+class CloudinaryService {
+  final String cloudName = 'dew8dbsgv';
+  final String apiKey = '945639635579818';
+  final String apiSecret = '';
+  final String uploadPreset = 'AutoHub';
+
+  Future<String> uploadImage(Uint8List imageBytes) async {
+    final url = 'https://api.cloudinary.com/v1_1/$cloudName/image/upload';
+
+    final request = http.MultipartRequest('POST', Uri.parse(url))
+      ..fields['upload_preset'] = uploadPreset
+      ..files.add(http.MultipartFile.fromBytes(
+        'file',
+        imageBytes,
+        filename: 'upload.jpg',
+      ));
+
+    final response = await request.send();
+
+    if (response.statusCode == 200) {
+      final responseData = await response.stream.bytesToString();
+      final jsonResponse = jsonDecode(responseData);
+      return jsonResponse['secure_url'];
+    } else {
+      throw Exception('Falha ao fazer upload da imagem');
+    }
+  }
 }
 
 class _MyAnnouncementsScreenState extends State<MyAnnouncementsScreen> {
@@ -32,7 +66,9 @@ class _MyAnnouncementsScreenState extends State<MyAnnouncementsScreen> {
     return Scaffold(
       drawer: Menu(user: widget.user),
       appBar: AppBar(
-        title: const Text('Seus carros'),
+        title: const Text(
+          'Seus Anúncios',
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -103,7 +139,7 @@ class _MyAnnouncementsScreenState extends State<MyAnnouncementsScreen> {
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
-                            color: Colors.white, // Fundo branco
+                            color: Colors.white,
                           ),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,8 +147,8 @@ class _MyAnnouncementsScreenState extends State<MyAnnouncementsScreen> {
                               model.imageUrl != null
                                   ? Image.network(
                                       model.imageUrl!,
-                                      width: 64,
-                                      height: 64,
+                                      width: 120,
+                                      height: 120,
                                       fit: BoxFit.cover,
                                     )
                                   : const Icon(
@@ -141,14 +177,14 @@ class _MyAnnouncementsScreenState extends State<MyAnnouncementsScreen> {
                                       ),
                                     ),
                                     Text(
-                                      'Quilometragem: ${model.quilometragem} Km',
+                                      'Quilometragem: ${formatNumber(model.quilometragem)} Km',
                                       style: const TextStyle(
                                         color: Colors.black87,
                                         fontSize: 16,
                                       ),
                                     ),
                                     Text(
-                                      'Preço: ${model.preco} R\$',
+                                      'Preço: ${formatNumber(model.preco)} R\$',
                                       style: const TextStyle(
                                         color: Colors.purple,
                                         fontSize: 18,
@@ -199,6 +235,35 @@ class _MyAnnouncementsScreenState extends State<MyAnnouncementsScreen> {
   }
 }
 
+class ThousandsFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (newValue.text.isEmpty) {
+      return newValue;
+    }
+
+    String cleanedText = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+
+    double value = double.tryParse(cleanedText) ?? 0.0;
+    final formatter = NumberFormat.decimalPattern('pt_BR');
+    String formattedText = formatter.format(value);
+
+    return TextEditingValue(
+      text: formattedText,
+      selection: TextSelection.collapsed(offset: formattedText.length),
+    );
+  }
+}
+
+double parseFormattedNumber(String formattedNumber) {
+  String cleanedNumber =
+      formattedNumber.replaceAll('.', '').replaceAll(',', '.');
+  return double.tryParse(cleanedNumber) ?? 0.0;
+}
+
 class AddEditCarScreen extends StatefulWidget {
   final User user;
   final Car? car;
@@ -222,6 +287,7 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
   final TextEditingController precoController = TextEditingController();
   final TextEditingController descricaoController = TextEditingController();
 
+  Uint8List? imageData;
   String? imageUrl;
 
   @override
@@ -230,8 +296,8 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
     if (widget.car != null) {
       modeloController.text = widget.car!.modelo;
       marcaController.text = widget.car!.marca;
-      quilometragemController.text = widget.car!.quilometragem;
-      precoController.text = widget.car!.preco;
+      quilometragemController.text = widget.car!.quilometragem.toString();
+      precoController.text = widget.car!.preco.toString();
       descricaoController.text = widget.car!.descricao ?? '';
       imageUrl = widget.car!.imageUrl;
     }
@@ -241,55 +307,161 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.car == null ? 'Adicionar Carro' : 'Editar Carro'),
+        title:
+            Text(widget.car == null ? 'Adicionar Anúncio' : 'Editar Anúncio'),
       ),
-      body: Padding(
+      body: Container(
+        color: Colors.white,
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
+            if (imageData != null)
+              Container(
+                height: 350,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.purple.shade200, width: 4),
+                    color: Colors.white),
+                child: Image.memory(
+                  imageData!,
+                  fit: BoxFit.contain,
+                ),
+              )
+            else if (imageUrl != null)
+              Container(
+                height: 350,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.purple.shade200, width: 4),
+                    color: Colors.white),
+                child: Image.network(
+                  imageUrl!,
+                  fit: BoxFit.contain,
+                ),
+              )
+            else
+              Container(
+                  height: 350,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border:
+                          Border.all(color: Colors.purple.shade200, width: 4),
+                      color: Colors.white),
+                  child: Image.asset('assets/images/photo_add_icon.png')),
+            const SizedBox(height: 30),
             TextField(
-              controller: modeloController,
-              decoration: const InputDecoration(labelText: 'Modelo'),
+              controller:
+                  modeloController, // Color.fromARGB(255, 206, 147, 216)
+              decoration: const InputDecoration(
+                  labelText: 'Modelo',
+                  labelStyle:
+                      TextStyle(color: Color.fromARGB(225, 117, 117, 117)),
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: Color.fromARGB(255, 206, 147, 216),
+                          width: 2.0),
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
             TextField(
               controller: marcaController,
-              decoration: const InputDecoration(labelText: 'Marca'),
+              decoration: const InputDecoration(
+                  labelText: 'Marca',
+                  labelStyle:
+                      TextStyle(color: Color.fromARGB(225, 117, 117, 117)),
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: Color.fromARGB(255, 206, 147, 216),
+                          width: 2.0),
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
             TextField(
               controller: quilometragemController,
               keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(labelText: 'Quilometragem'),
+              inputFormatters: [ThousandsFormatter()],
+              decoration: const InputDecoration(
+                labelText: 'Quilometragem (km)',
+                labelStyle:
+                    TextStyle(color: Color.fromARGB(225, 117, 117, 117)),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: Color.fromARGB(255, 206, 147, 216), width: 2.0),
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
+              ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
             TextField(
               controller: precoController,
               keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(labelText: 'Preço (R\$)'),
+              inputFormatters: [ThousandsFormatter()],
+              decoration: const InputDecoration(
+                labelText: 'Preço (R\$)',
+                labelStyle:
+                    TextStyle(color: Color.fromARGB(225, 117, 117, 117)),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: Color.fromARGB(255, 206, 147, 216), width: 2.0),
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
+              ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
             TextField(
               controller: descricaoController,
-              decoration: const InputDecoration(labelText: 'Descrição'),
+              decoration: const InputDecoration(
+                  labelText: 'Descrição',
+                  labelStyle:
+                      TextStyle(color: Color.fromARGB(225, 117, 117, 117)),
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: Color.fromARGB(255, 206, 147, 216),
+                          width: 2.0),
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
             ),
-            const SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: selectImage,
-              icon: const Icon(Icons.image),
-              label: const Text('Selecionar Imagem'),
-            ),
-            if (imageUrl != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: Image.network(imageUrl!),
+            const SizedBox(height: 30),
+            Container(
+              width: 1920,
+              height: 45,
+              child: OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(
+                      color: Color.fromARGB(255, 206, 147, 216), width: 2),
+                  backgroundColor: Colors.white,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                ),
+                onPressed: selectImage,
+                icon: const Icon(
+                  Icons.image,
+                  color: Color.fromARGB(255, 206, 147, 216),
+                ),
+                label: const Text('Selecionar Imagem',
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 206, 147, 216),
+                      fontSize: 15,
+                    )),
               ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: saveCar,
-              child: Text(widget.car == null ? 'Salvar' : 'Atualizar'),
+            ),
+            const SizedBox(height: 15),
+            Container(
+              width: 1920,
+              height: 45,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(151, 141, 11, 201),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                ),
+                onPressed: saveCar,
+                child: Text(
+                  widget.car == null ? 'Salvar' : 'Atualizar',
+                  style: TextStyle(color: Colors.white, fontSize: 15),
+                ),
+              ),
             ),
           ],
         ),
@@ -302,17 +474,10 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      Uint8List? imageData = await pickedFile.readAsBytes();
-      final storageRef = FirebaseStorage.instance
-          .ref()
-          .child('${widget.user.uid}/${Uuid().v1()}');
-
-      final uploadTask = storageRef.putData(imageData);
-      final snapshot = await uploadTask;
-      final url = await snapshot.ref.getDownloadURL();
-
+      final data = await pickedFile.readAsBytes();
       setState(() {
-        imageUrl = url;
+        imageData = data;
+        imageUrl = null;
       });
     }
   }
@@ -331,16 +496,36 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
       return;
     }
 
+    double quilometragem = parseFormattedNumber(quilometragemController.text);
+    double preco = parseFormattedNumber(precoController.text);
+
+    String? uploadedImageUrl;
+
+    if (imageData != null) {
+      final cloudinaryService = CloudinaryService();
+      try {
+        uploadedImageUrl = await cloudinaryService.uploadImage(imageData!);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao fazer upload da imagem: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+    }
+
     Car car = Car(
       id: widget.car?.id ?? const Uuid().v1(),
       modelo: modeloController.text,
       marca: marcaController.text,
-      quilometragem: quilometragemController.text,
-      preco: precoController.text,
+      quilometragem: quilometragem,
+      preco: preco,
       descricao:
           descricaoController.text.isNotEmpty ? descricaoController.text : null,
-      imageUrl: imageUrl,
-      userId: widget.user.uid, // Inclui o identificador do usuário
+      imageUrl: uploadedImageUrl ?? imageUrl,
+      userId: widget.user.uid,
     );
 
     await FirebaseFirestore.instance

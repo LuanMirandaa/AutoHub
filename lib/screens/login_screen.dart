@@ -8,195 +8,183 @@ class LoginScreen extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _senhaController = TextEditingController();
   AuthService authService = AuthService();
-
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Container(
-          color: Colors.white,
-          height: screenHeight,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: EdgeInsets.all(screenWidth * 0.05),
-                margin: EdgeInsets.all(screenWidth * 0.05),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  children: [
-                    Image.asset(
-                      'assets/images/logo.png',
-                      height: screenHeight * 0.2,
-                      width: screenWidth * 0.4,
-                    ),
-                    SizedBox(height: screenHeight * 0.1),
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          TextField(
-                            controller: _emailController,
-                            decoration: InputDecoration(
-                              hintText: 'Insira seu email',
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: screenWidth * 0.08,
-                                vertical: 0,
-                              ),
-                              hintStyle: TextStyle(
-                                color: const Color(0xFF520453).withOpacity(0.6),
-                              ),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: const Color(0xFF9A007E),
-                                  width: 2,
-                                ),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: const Color(0xFF9A007E),
-                                  width: 2,
-                                ),
-                              ),
-                            ),
+      body: Container(
+        color: Colors.white,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: EdgeInsets.all(20),
+              margin: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(8)),
+              child: Column(
+                children: [
+                  Image.asset(
+                    'assets/images/logo.png',
+                    height: 260,
+                    width: 400,
+                    fit: BoxFit.cover,
+                  ),
+                  Text(
+                    'Bem-vindo ao AutoHub',
+                    style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text('Faça login',
+                      style:
+                          TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text('e aproveite a experiência',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 20,
+                      )),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  TextField(
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                        labelText: 'E-mail',
+                        suffixIcon: Icon(Icons.email_outlined),
+                        labelStyle: TextStyle(color: Colors.grey[600]),
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Color.fromARGB(255, 206, 147, 216),
+                                width: 2.0),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10)))),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  TextField(
+                      obscureText: true,
+                      controller: _senhaController,
+                      decoration: InputDecoration(
+                          labelText: 'Senha',
+                          suffixIcon: Icon(Icons.password_outlined),
+                          labelStyle: TextStyle(color: Colors.grey[600]),
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: Color.fromARGB(255, 206, 147, 216),
+                                  width: 2.0),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10))))),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    textDirection: TextDirection.rtl,
+                    children: [
+                      TextButton(
+                          onPressed: () {},
+                          child: Text(
+                            'Esqueci minha senha',
+                            style: TextStyle(
+                                color: Color.fromARGB(255, 206, 147, 216),
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold),
+                          )),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  SizedBox(
+                    width: 1920,
+                    height: 45,
+                    child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              const Color.fromARGB(151, 141, 11, 201),
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
                           ),
-                          SizedBox(height: screenHeight * 0.05),
-                          TextField(
-                            obscureText: true,
-                            controller: _senhaController,
-                            decoration: InputDecoration(
-                              hintText: 'Senha',
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: screenWidth * 0.08,
-                              ),
-                              hintStyle: TextStyle(
-                                color: const Color(0xFF520453).withOpacity(0.6),
-                              ),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: const Color(0xFF9A007E),
-                                  width: 2,
-                                ),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: const Color(0xFF9A007E),
-                                  width: 2,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.05),
-                    ElevatedButton(
-                      onPressed: () {
-                        authService
-                            .entrarUsuario(
-                          email: _emailController.text,
-                          senha: _senhaController.text,
-                        )
-                            .then((String? erro) {
-                          if (erro != null) {
-                            final snackBar = SnackBar(
-                              content: Text(erro),
-                              backgroundColor: Colors.red,
-                            );
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(snackBar);
-                          }
-                        });
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
+                        ),
+                        onPressed: () {
+                          authService
+                              .entrarUsuario(
+                                  email: _emailController.text,
+                                  senha: _senhaController.text)
+                              .then((String? erro) {
+                            if (erro != null) {
+                              final snackBar = SnackBar(
+                                  content: Text(erro),
+                                  backgroundColor: Colors.red);
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(snackBar);
+                            }
+                          });
+                        },
+                        child: Text(
+                          'Entrar',
+                          style: TextStyle(color: Colors.white, fontSize: 15),
+                        )),
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  SizedBox(
+                    width: 1920,
+                    height: 45,
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
                         side: BorderSide(
-                          color: const Color.fromARGB(255, 127, 6, 148),
-                          width: screenWidth * 0.01,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                        ),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: screenWidth * 0.2,
-                          vertical: screenHeight * 0.02,
+                            color: Color.fromARGB(255, 206, 147, 216),
+                            width: 2),
+                        backgroundColor: Colors.white,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
                         ),
                       ),
-                      child: const Text(
-                        'Entrar',
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 127, 6, 148),
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.02),
-                    ElevatedButton(
                       onPressed: () {
                         Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => RegisterScreen(),
-                          ),
-                        );
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RegisterScreen(),
+                            ));
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 127, 6, 148),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                        ),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: screenWidth * 0.16,
-                          vertical: screenHeight * 0.02,
-                        ),
-                      ),
-                      child: const Text(
-                        "Cadastrar-se",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
+                      child: Text('Cadastrar-se',
+                          style: TextStyle(
+                              color: Color.fromARGB(255, 206, 147, 216),
+                              fontSize: 15)),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: screenHeight * 0.05),
-                      child: Column(
-                        children: [
-                          TextButton(
-                            onPressed: () {},
-                            child: const Text(
-                              "Entrar com conta Google",
-                              style: TextStyle(
-                                color: Color.fromARGB(255, 127, 6, 148),
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          Divider(
-                            color: const Color.fromARGB(255, 127, 6, 148),
-                            thickness: 2,
-                            indent: screenWidth * 0.15,
-                            endIndent: screenWidth * 0.15,
-                          ),
-                        ],
-                      ),
+                  ),
+                  SizedBox(
+                    height: 25,
+                  ),
+                  Text(
+                    '____________________ Conectar usando ___________________',
+                    style: TextStyle(
+                      color: Colors.black,
                     ),
-                  ],
-                ),
+                  ),
+                  SizedBox(
+                    height: 25,
+                  ),
+                  OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(
+                          color: Color.fromARGB(255, 206, 147, 216),
+                        ),
+                        backgroundColor: Colors.white,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                        ),
+                      ),
+                      onPressed: () {},
+                      child: Icon(Icons.g_mobiledata_sharp))
+                ],
               ),
-            ],
-          ),
+            )
+          ],
         ),
       ),
     );

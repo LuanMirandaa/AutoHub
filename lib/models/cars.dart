@@ -2,8 +2,8 @@ class Car {
   final String id;
   final String modelo;
   final String marca;
-  final String quilometragem;
-  final String preco;
+  final double quilometragem;
+  final double preco;
   final String? descricao;
   final String? imageUrl;
   final String userId;
@@ -37,8 +37,8 @@ class Car {
       id: map['id'],
       modelo: map['modelo'],
       marca: map['marca'],
-      quilometragem: map['quilometragem'],
-      preco: map['preco'],
+      quilometragem: map['quilometragem'].toDouble(),
+      preco: map['preco'].toDouble(),
       descricao: map['descricao'],
       imageUrl: map['imageUrl'],
       userId: map['userId'],

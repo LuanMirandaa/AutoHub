@@ -6,7 +6,8 @@ class RegisterScreen extends StatelessWidget {
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _senhaController = TextEditingController();
-  final TextEditingController _confirmarSenhaController = TextEditingController();
+  final TextEditingController _confirmarSenhaController =
+      TextEditingController();
   final TextEditingController _nomeController = TextEditingController();
 
   AuthService authServicer = AuthService();
@@ -27,17 +28,36 @@ class RegisterScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Column(
-                children: [Image.asset('assets/images/logo.png', width: 250, height: 250,),
+                children: [
+                  Image.asset(
+                    'assets/images/logo.png',
+                    width: 250,
+                    height: 250,
+                  ),
                   TextField(
                     controller: _nomeController,
-                    decoration: const InputDecoration(hintText: 'Nome'),
+                    decoration: const InputDecoration(
+                      labelStyle:
+                          TextStyle(color: Color.fromARGB(255, 97, 94, 94)),
+                    labelText: 'Nome de usuario',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                    ),
+                  ),
                   ),
                   const SizedBox(
                     height: 30,
                   ),
                   TextField(
                     controller: _emailController,
-                    decoration: const InputDecoration(hintText: 'E-mail'),
+                    decoration: const InputDecoration(
+                    labelStyle:
+                          TextStyle(color: Color.fromARGB(255, 97, 94, 94)),
+                    labelText: 'E-mail',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                    ),
+                  ),
                   ),
                   const SizedBox(
                     height: 30,
@@ -45,7 +65,13 @@ class RegisterScreen extends StatelessWidget {
                   TextField(
                     obscureText: true,
                     controller: _senhaController,
-                    decoration: const InputDecoration(hintText: 'Senha'),
+                    decoration: const InputDecoration(
+                      labelStyle: TextStyle(color: Color.fromARGB(255, 97, 94, 94)),
+                      labelText: 'Senha',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                      ),
+                    ),
                   ),
                   const SizedBox(
                     height: 30,
@@ -53,27 +79,54 @@ class RegisterScreen extends StatelessWidget {
                   TextField(
                     obscureText: true,
                     controller: _confirmarSenhaController,
-                    decoration: const InputDecoration(hintText: 'Confirmar Senha'),
+                    decoration:
+                        const InputDecoration(
+                          labelStyle:
+                          TextStyle(color: Color.fromARGB(255, 97, 94, 94)),
+                      labelText: 'Confirmar senha',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                      ),
+                    ),
                   ),
                   const SizedBox(
-                    height: 30,),
-
-                  ElevatedButton(onPressed: (){
-                    if (_senhaController.text == _confirmarSenhaController.text){
-                        authServicer.cadastrarUsuario(email: _emailController.text, senha: _senhaController.text, nome: _nomeController.text).then((String? erro){
-
-                          if (erro != null){
-                            final snackBar = SnackBar(content: Text(erro), backgroundColor: Colors.red);
-                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                          } else{
+                    height: 30,
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_senhaController.text ==
+                          _confirmarSenhaController.text) {
+                        authServicer
+                            .cadastrarUsuario(
+                                email: _emailController.text,
+                                senha: _senhaController.text,
+                                nome: _nomeController.text)
+                            .then((String? erro) {
+                          if (erro != null) {
+                            final snackBar = SnackBar(
+                                content: Text(erro),
+                                backgroundColor: Colors.red);
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(snackBar);
+                          } else {
                             Navigator.pop(context);
                           }
                         });
-                    }else{
-                      const snackBar = SnackBar(content: Text('As senhas não correspondem'), backgroundColor: Colors.red,);
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                    }
-                  }, child: const Text('Cadastrar'))
+                      } else {
+                        const snackBar = SnackBar(
+                          content: Text('As senhas não correspondem'),
+                          backgroundColor: Colors.red,
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      }
+                    },
+                    child: const Text('Cadastrar'),
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5), // Bordas quadradas
+                      ),
+                    ),
+                  )
                 ],
               )),
         ])),
