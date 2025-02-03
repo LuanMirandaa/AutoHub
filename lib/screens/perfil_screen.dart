@@ -1,7 +1,11 @@
+import 'dart:typed_data';
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:auto_hub/screens/my_announcements_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+import 'package:auto_hub/screens/my_announcements_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final User user;
@@ -13,8 +17,8 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late TextEditingController _nameController;
-  ImageProvider<Object> _avatarImage = const AssetImage(
-      'assets/images/avatar.png');
+  ImageProvider<Object> _avatarImage =
+      const AssetImage('assets/images/avatar.png');
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _urlController = TextEditingController();
 
@@ -33,16 +37,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.dispose();
   }
 
-
-
-
-
-
-
-
-
-
-
   void _loadAvatarImage() async {
     DocumentSnapshot userDoc =
         await _firestore.collection('users').doc(widget.user.uid).get();
@@ -52,21 +46,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (imagePath.startsWith('http')) {
           _avatarImage = NetworkImage(imagePath);
         } else {
-          _avatarImage =
-              AssetImage(imagePath);
+          _avatarImage = AssetImage(imagePath);
         }
       });
     }
   }
-
 
   void _saveAvatarImage(String imagePath) async {
     await _firestore.collection('users').doc(widget.user.uid).set({
       'avatarImage': imagePath,
     }, SetOptions(merge: true));
   }
-
-
 
   void _saveName() async {
     try {
@@ -83,10 +73,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-
-
-
-void _showEditNameDialog() {
+  void _showEditNameDialog() {
     showDialog(
       context: context,
       builder: (context) {
@@ -114,8 +101,6 @@ void _showEditNameDialog() {
       },
     );
   }
-
-
 
   bool _isValidUrl(String url) {
     try {
@@ -147,56 +132,46 @@ void _showEditNameDialog() {
                   ],
                 ),
                 const SizedBox(height: 20),
-
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
                       _avatarImage =
                           const AssetImage('assets/images/avatar.png');
                     });
-                    _saveAvatarImage(
-                        'assets/images/avatar.png');
+                    _saveAvatarImage('assets/images/avatar.png');
                     Navigator.pop(context);
                   },
                   child: const Text('Remover imagem'),
                 ),
                 const SizedBox(height: 20),
-
-                TextField(
-                  controller: _urlController,
-                  decoration: const InputDecoration(
-                    labelText: 'Insira a URL da imagem',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 10),
-
                 ElevatedButton(
-                  onPressed: () {
-                    if (_urlController.text.isNotEmpty) {
-                      if (_isValidUrl(_urlController.text)) {
+                  onPressed: () async {
+                    final picker = ImagePicker();
+                    final pickedFile =
+                        await picker.pickImage(source: ImageSource.gallery);
+
+                    if (pickedFile != null) {
+                      final imageBytes = await pickedFile.readAsBytes();
+                      final cloudinaryService = CloudinaryService();
+                      try {
+                        final imageUrl =
+                            await cloudinaryService.uploadImage(imageBytes);
                         setState(() {
-                          _avatarImage = NetworkImage(_urlController
-                              .text);
+                          _avatarImage = NetworkImage(imageUrl);
                         });
-                        _saveAvatarImage(
-                            _urlController.text);
+                        _saveAvatarImage(imageUrl);
                         Navigator.pop(context);
-                      } else {
+                      } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content:
-                                  Text('Por favor, insira uma URL válida.')),
+                          SnackBar(
+                            content: Text('Erro ao fazer upload da imagem: $e'),
+                            backgroundColor: Colors.red,
+                          ),
                         );
                       }
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('Por favor, insira uma URL.')),
-                      );
                     }
                   },
-                  child: const Text('Usar imagem da URL'),
+                  child: const Text('Selecionar imagem'),
                 ),
               ],
             ),
@@ -210,8 +185,7 @@ void _showEditNameDialog() {
     return GestureDetector(
       onTap: () {
         setState(() {
-          _avatarImage =
-              AssetImage(imagePath);
+          _avatarImage = AssetImage(imagePath);
         });
         _saveAvatarImage(imagePath);
         Navigator.pop(context);
@@ -342,7 +316,7 @@ void _showEditNameDialog() {
               ],
             ),
           ),
-          const SizedBox(height: 20),
+                  const SizedBox(height: 20),
           Padding(
             padding: const EdgeInsets.only(left: 20.0),
             child: Column(
@@ -374,7 +348,7 @@ void _showEditNameDialog() {
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: ElevatedButton(
                     onPressed: () {
-
+                      // Adicione a funcionalidade do botão "Favoritados 17" aqui
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.purple[100],
@@ -391,5 +365,34 @@ void _showEditNameDialog() {
         ],
       ),
     );
+  }
+}
+
+class CloudinaryService {
+  final String cloudName = 'dew8dbsgv';
+  final String apiKey = '945639635579818';
+  final String apiSecret = '';
+  final String uploadPreset = 'AutoHub';
+
+  Future<String> uploadImage(Uint8List imageBytes) async {
+    final url = 'https://api.cloudinary.com/v1_1/$cloudName/image/upload';
+
+    final request = http.MultipartRequest('POST', Uri.parse(url))
+      ..fields['upload_preset'] = uploadPreset
+      ..files.add(http.MultipartFile.fromBytes(
+        'file',
+        imageBytes,
+        filename: 'upload.jpg',
+      ));
+
+    final response = await request.send();
+
+    if (response.statusCode == 200) {
+      final responseData = await response.stream.bytesToString();
+      final jsonResponse = jsonDecode(responseData);
+      return jsonResponse['secure_url'];
+    } else {
+      throw Exception('Falha ao fazer upload da imagem');
+    }
   }
 }

@@ -310,7 +310,7 @@ void _showFiltersDialog() {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'Modelo: ${model.modelo}',
+                                          '${model.modelo}',
                                           style: const TextStyle(
                                             color: Colors.purple,
                                             fontSize: 14,
@@ -318,22 +318,24 @@ void _showFiltersDialog() {
                                           ),
                                         ),
                                         Text(
-                                          'Marca: ${model.marca}',
+                                          '${model.marca}',
                                           style: const TextStyle(
                                             color: Colors.black87,
                                             fontSize: 14,
                                           ),
                                         ),
                                         Text(
-                                          'Quilometragem: ${formatNumber(model.quilometragem)} Km',
+                                          '${formatNumber(model.quilometragem)} Km',
                                           style: const TextStyle(
                                             color: Colors.black87,
                                             fontSize: 14,
                                           ),
                                         ),
-                                        SizedBox(height: 20),
+                                        SizedBox(height: 10,),
+                                        const Divider(height: 2),
+                                        SizedBox(height: 10),
                                         Text(
-                                          'Preço: ${formatNumber(model.preco)} R\$',
+                                          ' R\$${formatNumber(model.preco)}',
                                           style: const TextStyle(
                                             color: Colors.purple,
                                             fontSize: 18,
@@ -355,7 +357,6 @@ void _showFiltersDialog() {
     );
   }
 }
-
 class OfferDetailsScreen extends StatelessWidget {
   final Car car;
   const OfferDetailsScreen({super.key, required this.car});
@@ -371,15 +372,22 @@ class OfferDetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.purple.shade200, width: 3),
+            // Centralizando a imagem
+            Center(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.purple.shade200, width: 3),
+                ),
+                child: car.imageUrl != null
+                    ? Image.network(
+                        car.imageUrl!,
+                        width: 400,
+                        height: 250,
+                        fit: BoxFit.cover,
+                      )
+                    : const Icon(Icons.image, size: 250, color: Colors.grey),
               ),
-              child: car.imageUrl != null
-                  ? Image.network(car.imageUrl!,
-                      width: 400, height: 250, fit: BoxFit.cover)
-                  : const Icon(Icons.image, size: 250, color: Colors.grey),
             ),
             const SizedBox(height: 16),
             Container(
