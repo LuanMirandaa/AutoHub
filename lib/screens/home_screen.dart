@@ -185,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text(
           'Auto Hub',
-          style: TextStyle(fontSize: 22),
+          style: TextStyle(fontSize: 22,fontWeight: FontWeight.w500,color: Color.fromARGB(255, 84, 4, 98) ),
         ),
         centerTitle: true,
       ),
@@ -261,15 +261,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 0, vertical: 8),
                           itemCount: filteredCars
-                              .where((car) => car.modelo
-                                  .toLowerCase()
-                                  .contains(searchController.text.toLowerCase()))
+                              .where((car) => car.modelo.toLowerCase().contains(
+                                  searchController.text.toLowerCase()))
                               .length,
                           itemBuilder: (context, index) {
                             Car model = filteredCars
                                 .where((car) => car.modelo
                                     .toLowerCase()
-                                    .contains(searchController.text.toLowerCase()))
+                                    .contains(
+                                        searchController.text.toLowerCase()))
                                 .toList()[index];
                             return Card(
                               elevation: 5,
@@ -347,7 +347,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
-                                            
                                           ],
                                         ),
                                       ),

@@ -82,9 +82,18 @@ class LoginScreen extends StatelessWidget {
                   SizedBox(
                     height: 20,
                   ),
-                  Row(textDirection: TextDirection.rtl,
+                  Row(
+                    textDirection: TextDirection.rtl,
                     children: [
-                      TextButton(onPressed: (){}, child: Text('Esqueci minha senha', style: TextStyle(color: Color.fromARGB(255, 206, 147, 216), fontSize: 15, fontWeight: FontWeight.bold),)),
+                      TextButton(
+                          onPressed: () {},
+                          child: Text(
+                            'Esqueci minha senha',
+                            style: TextStyle(
+                                color: Color.fromARGB(255, 206, 147, 216),
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold),
+                          )),
                     ],
                   ),
                   SizedBox(height: 20),
@@ -122,16 +131,14 @@ class LoginScreen extends StatelessWidget {
                   SizedBox(
                     height: 15,
                   ),
-                  
                   SizedBox(
                     width: 1920,
                     height: 45,
-          
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
-                        
-                        side:
-                            BorderSide(color: Color.fromARGB(255, 206, 147, 216), width: 2),
+                        side: BorderSide(
+                            color: Color.fromARGB(255, 206, 147, 216),
+                            width: 2),
                         backgroundColor: Colors.white,
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -148,8 +155,6 @@ class LoginScreen extends StatelessWidget {
                           style: TextStyle(
                               color: Color.fromARGB(255, 206, 147, 216),
                               fontSize: 15)),
-                    
-                    
                     ),
                   ),
                   SizedBox(
@@ -164,14 +169,19 @@ class LoginScreen extends StatelessWidget {
                   SizedBox(
                     height: 25,
                   ),
-                  OutlinedButton(style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Color.fromARGB(255, 206, 147, 216),),
-                      backgroundColor:  Colors.white,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
+
+                  OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(
+                          color: Color.fromARGB(255, 206, 147, 216),
+                        ),
+                        backgroundColor: Colors.white,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                        ),
                       ),
-                    ),
-                      onPressed: () {}, child: Icon(Icons.g_mobiledata_sharp))
+                      onPressed: () {},
+                      child: Icon(Icons.g_mobiledata_sharp))
                 ],
               ),
             )

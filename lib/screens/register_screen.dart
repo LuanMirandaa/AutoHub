@@ -6,7 +6,8 @@ class RegisterScreen extends StatelessWidget {
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _senhaController = TextEditingController();
-  final TextEditingController _confirmarSenhaController = TextEditingController();
+  final TextEditingController _confirmarSenhaController =
+      TextEditingController();
   final TextEditingController _nomeController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
@@ -43,9 +44,12 @@ class RegisterScreen extends StatelessWidget {
                         controller: _nomeController,
                         decoration: const InputDecoration(
                           hintText: 'Nome',
-                          hintStyle: TextStyle(color: Color.fromARGB(255, 117, 117, 117)),
+                          hintStyle: TextStyle(
+                              color: Color.fromARGB(255, 117, 117, 117)),
                           border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color.fromARGB(255, 206, 147, 216), width: 2.0),
+                            borderSide: BorderSide(
+                                color: Color.fromARGB(255, 206, 147, 216),
+                                width: 2.0),
                             borderRadius: BorderRadius.all(Radius.circular(10)),
                           ),
                         ),
@@ -61,16 +65,21 @@ class RegisterScreen extends StatelessWidget {
                         controller: _emailController,
                         decoration: const InputDecoration(
                           hintText: 'E-mail',
-                          hintStyle: TextStyle(color: Color.fromARGB(255, 117, 117, 117)),
+                          hintStyle: TextStyle(
+                              color: Color.fromARGB(255, 117, 117, 117)),
                           border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color.fromARGB(255, 206, 147, 216), width: 2.0),
+                            borderSide: BorderSide(
+                                color: Color.fromARGB(255, 206, 147, 216),
+                                width: 2.0),
                             borderRadius: BorderRadius.all(Radius.circular(10)),
                           ),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Por favor, insira seu e-mail';
-                          } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                          } else if (!RegExp(
+                                  r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                              .hasMatch(value)) {
                             return 'Por favor, insira um e-mail válido';
                           }
                           return null;
@@ -82,9 +91,12 @@ class RegisterScreen extends StatelessWidget {
                         controller: _senhaController,
                         decoration: const InputDecoration(
                           hintText: 'Senha',
-                          hintStyle: TextStyle(color: Color.fromARGB(255, 117, 117, 117)),
+                          hintStyle: TextStyle(
+                              color: Color.fromARGB(255, 117, 117, 117)),
                           border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color.fromARGB(255, 206, 147, 216), width: 2.0),
+                            borderSide: BorderSide(
+                                color: Color.fromARGB(255, 206, 147, 216),
+                                width: 2.0),
                             borderRadius: BorderRadius.all(Radius.circular(10)),
                           ),
                         ),
@@ -103,9 +115,12 @@ class RegisterScreen extends StatelessWidget {
                         controller: _confirmarSenhaController,
                         decoration: const InputDecoration(
                           hintText: 'Confirmar Senha',
-                          hintStyle: TextStyle(color: Color.fromARGB(255, 117, 117, 117)),
+                          hintStyle: TextStyle(
+                              color: Color.fromARGB(255, 117, 117, 117)),
                           border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color.fromARGB(255, 206, 147, 216), width: 2.0),
+                            borderSide: BorderSide(
+                                color: Color.fromARGB(255, 206, 147, 216),
+                                width: 2.0),
                             borderRadius: BorderRadius.all(Radius.circular(10)),
                           ),
                         ),
@@ -124,26 +139,30 @@ class RegisterScreen extends StatelessWidget {
                         height: 45,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(151, 141, 11, 201),
+                            backgroundColor:
+                                const Color.fromARGB(151, 141, 11, 201),
                             shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(10)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
                             ),
                           ),
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              if (_senhaController.text == _confirmarSenhaController.text) {
-                                String? erro = await authServicer.cadastrarUsuario(
+                              if (_senhaController.text ==
+                                  _confirmarSenhaController.text) {
+                                String? erro =
+                                    await authServicer.cadastrarUsuario(
                                   email: _emailController.text,
                                   senha: _senhaController.text,
                                   nome: _nomeController.text,
                                 );
 
                                 if (erro != null) {
-                                 
                                   if (erro == 'Email já cadastrado') {
-                                    _formKey.currentState!.validate(); 
-                                  } else if (erro == 'Senha fraca (mínimo de 6 caracteres)') {
-                                    _formKey.currentState!.validate(); 
+                                    _formKey.currentState!.validate();
+                                  } else if (erro ==
+                                      'Senha fraca (mínimo de 6 caracteres)') {
+                                    _formKey.currentState!.validate();
                                   }
                                 } else {
                                   Navigator.pop(context);
