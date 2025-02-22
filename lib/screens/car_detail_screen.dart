@@ -13,14 +13,12 @@ class CarDetailScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.purple),
         title: const Text(
           'Detalhes do Anúncio',
           style: TextStyle(color: Colors.black),
         ),
-        
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -65,8 +63,11 @@ class CarDetailScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             _buildInfoTile('Marca', car.marca),
-            _buildInfoTile('Quilometragem', '${formatNumber(car.quilometragem)} Km'),
-            SizedBox(height: 10,),
+            _buildInfoTile(
+                'Quilometragem', '${formatNumber(car.quilometragem)} Km'),
+            SizedBox(
+              height: 10,
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: Text(
@@ -80,23 +81,14 @@ class CarDetailScreen extends StatelessWidget {
             const SizedBox(height: 250),
             Center(
               child: Container(
-                 width: 1920,
-              height: 45,
+                width: 1920,
+                height: 45,
                 child: ElevatedButton(
-                  onPressed: () {Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ChatScreen(
-          receiverId: car.userId, 
-          receiverName: car.marca,
-        ),
-      ),
-    );
-                         
-                  },
+                  onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:Color.fromARGB(151, 141, 11, 201),
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                    backgroundColor: Color.fromARGB(151, 141, 11, 201),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 32, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),

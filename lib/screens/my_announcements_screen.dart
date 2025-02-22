@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:auto_hub/components/menu.dart';
 import 'package:auto_hub/models/cars.dart';
+import 'package:auto_hub/helpers/format_number.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -10,8 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
-
 
 class MyAnnouncementsScreen extends StatefulWidget {
   final User user;
@@ -19,7 +20,6 @@ class MyAnnouncementsScreen extends StatefulWidget {
 
   @override
   State<MyAnnouncementsScreen> createState() => _MyAnnouncementsScreenState();
-  
 }
 
 class CloudinaryService {
@@ -39,7 +39,7 @@ class CloudinaryService {
         filename: 'upload.jpg',
       ));
 
-    final response = await request.send(); 
+    final response = await request.send();
 
     if (response.statusCode == 200) {
       final responseData = await response.stream.bytesToString();
@@ -52,7 +52,6 @@ class CloudinaryService {
 }
 
 class _MyAnnouncementsScreenState extends State<MyAnnouncementsScreen> {
-
   List<Car> listCars = [];
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -140,7 +139,7 @@ class _MyAnnouncementsScreenState extends State<MyAnnouncementsScreen> {
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
-                            color: Colors.white, 
+                            color: Colors.white,
                           ),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -178,14 +177,14 @@ class _MyAnnouncementsScreenState extends State<MyAnnouncementsScreen> {
                                       ),
                                     ),
                                     Text(
-                                      'Quilometragem: ${model.quilometragem} Km',
+                                      'Quilometragem: ${formatNumber(model.quilometragem)} Km',
                                       style: const TextStyle(
                                         color: Colors.black87,
                                         fontSize: 16,
                                       ),
                                     ),
                                     Text(
-                                      'Preço: ${model.preco} R\$',
+                                      'Preço: ${formatNumber(model.preco)} R\$',
                                       style: const TextStyle(
                                         color: Colors.purple,
                                         fontSize: 18,
@@ -236,6 +235,35 @@ class _MyAnnouncementsScreenState extends State<MyAnnouncementsScreen> {
   }
 }
 
+class ThousandsFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (newValue.text.isEmpty) {
+      return newValue;
+    }
+
+    String cleanedText = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+
+    double value = double.tryParse(cleanedText) ?? 0.0;
+    final formatter = NumberFormat.decimalPattern('pt_BR');
+    String formattedText = formatter.format(value);
+
+    return TextEditingValue(
+      text: formattedText,
+      selection: TextSelection.collapsed(offset: formattedText.length),
+    );
+  }
+}
+
+double parseFormattedNumber(String formattedNumber) {
+  String cleanedNumber =
+      formattedNumber.replaceAll('.', '').replaceAll(',', '.');
+  return double.tryParse(cleanedNumber) ?? 0.0;
+}
+
 class AddEditCarScreen extends StatefulWidget {
   final User user;
   final Car? car;
@@ -268,8 +296,8 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
     if (widget.car != null) {
       modeloController.text = widget.car!.modelo;
       marcaController.text = widget.car!.marca;
-      quilometragemController.text = widget.car!.quilometragem;
-      precoController.text = widget.car!.preco;
+      quilometragemController.text = widget.car!.quilometragem.toString();
+      precoController.text = widget.car!.preco.toString();
       descricaoController.text = widget.car!.descricao ?? '';
       imageUrl = widget.car!.imageUrl;
     }
@@ -308,7 +336,7 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
                     color: Colors.white),
                 child: Image.network(
                   imageUrl!,
-                  fit: BoxFit.contain  ,
+                  fit: BoxFit.contain,
                 ),
               )
             else
@@ -351,31 +379,33 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
             TextField(
               controller: quilometragemController,
               keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              inputFormatters: [ThousandsFormatter()], 
               decoration: const InputDecoration(
-                  labelText: 'Quilometragem (km)',
-                  labelStyle:
-                      TextStyle(color: Color.fromARGB(225, 117, 117, 117)),
+                labelText: 'Quilometragem (km)',
+                labelStyle:
+                    TextStyle(color: Color.fromARGB(225, 117, 117, 117)),
                 border: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Color.fromARGB(255, 206, 147, 216),
-                          width: 2.0),
-                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+                  borderSide: BorderSide(
+                      color: Color.fromARGB(255, 206, 147, 216), width: 2.0),
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
+              ),
             ),
             const SizedBox(height: 15),
             TextField(
               controller: precoController,
               keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              inputFormatters: [ThousandsFormatter()],
               decoration: const InputDecoration(
-                  labelText: 'Preço (R\$)',
-                  labelStyle:
-                      TextStyle(color: Color.fromARGB(225, 117, 117, 117)),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Color.fromARGB(255, 206, 147, 216),
-                          width: 2.0),
-                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+                labelText: 'Preço (R\$)',
+                labelStyle:
+                    TextStyle(color: Color.fromARGB(225, 117, 117, 117)),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: Color.fromARGB(255, 206, 147, 216), width: 2.0),
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
+              ),
             ),
             const SizedBox(height: 15),
             TextField(
@@ -404,10 +434,15 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
                   ),
                 ),
                 onPressed: selectImage,
-                icon: const Icon(Icons.image, color:  Color.fromARGB(255, 206, 147, 216),
-                              ),
-                label: const Text('Selecionar Imagem', style: TextStyle(color: Color.fromARGB(255, 206, 147, 216),
-                              fontSize: 15,)),
+                icon: const Icon(
+                  Icons.image,
+                  color: Color.fromARGB(255, 206, 147, 216),
+                ),
+                label: const Text('Selecionar Imagem',
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 206, 147, 216),
+                      fontSize: 15,
+                    )),
               ),
             ),
             const SizedBox(height: 15),
@@ -448,54 +483,57 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
   }
 
   Future<void> saveCar() async {
-  if (modeloController.text.isEmpty ||
-      marcaController.text.isEmpty ||
-      quilometragemController.text.isEmpty ||
-      precoController.text.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Por favor, preencha todos os campos obrigatórios.'),
-        backgroundColor: Colors.red,
-      ),
-    );
-    return;
-  }
-
-  String? uploadedImageUrl;
-
-  if (imageData != null) {
-    final cloudinaryService = CloudinaryService();
-    try {
-      uploadedImageUrl = await cloudinaryService.uploadImage(imageData!);
-    } catch (e) {
+    if (modeloController.text.isEmpty ||
+        marcaController.text.isEmpty ||
+        quilometragemController.text.isEmpty ||
+        precoController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erro ao fazer upload da imagem: $e'),
+        const SnackBar(
+          content: Text('Por favor, preencha todos os campos obrigatórios.'),
           backgroundColor: Colors.red,
         ),
       );
       return;
     }
+
+    double quilometragem = parseFormattedNumber(quilometragemController.text);
+    double preco = parseFormattedNumber(precoController.text);
+
+    String? uploadedImageUrl;
+
+    if (imageData != null) {
+      final cloudinaryService = CloudinaryService();
+      try {
+        uploadedImageUrl = await cloudinaryService.uploadImage(imageData!);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao fazer upload da imagem: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+    }
+
+    Car car = Car(
+      id: widget.car?.id ?? const Uuid().v1(),
+      modelo: modeloController.text,
+      marca: marcaController.text,
+      quilometragem: quilometragem,
+      preco: preco,
+      descricao:
+          descricaoController.text.isNotEmpty ? descricaoController.text : null,
+      imageUrl: uploadedImageUrl ?? imageUrl,
+      userId: widget.user.uid,
+    );
+
+    await FirebaseFirestore.instance
+        .collection('Anúncios')
+        .doc(car.id)
+        .set(car.toMap());
+
+    widget.onRefresh();
+    Navigator.pop(context);
   }
-
-  Car car = Car(
-    id: widget.car?.id ?? const Uuid().v1(),
-    modelo: modeloController.text,
-    marca: marcaController.text,
-    quilometragem: quilometragemController.text,
-    preco: precoController.text,
-    descricao:
-        descricaoController.text.isNotEmpty ? descricaoController.text : null,
-    imageUrl: uploadedImageUrl ?? imageUrl,
-    userId: widget.user.uid,
-  );
-
-  await FirebaseFirestore.instance
-      .collection('Anúncios')
-      .doc(car.id)
-      .set(car.toMap());
-
-  widget.onRefresh();
-  Navigator.pop(context);
-}
 }

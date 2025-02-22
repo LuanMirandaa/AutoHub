@@ -39,7 +39,8 @@ class Menu extends StatelessWidget {
               );
             },
           ),
-          ListTile(leading: const Icon(Icons.apps_rounded),
+          ListTile(
+            leading: const Icon(Icons.apps_rounded),
             title: const Text('Seus anúncios'),
             onTap: () {
               Navigator.pushReplacement(
@@ -49,14 +50,10 @@ class Menu extends StatelessWidget {
                 ),
               );
             },
-
           ),
-          ListTile(leading: const Icon(Icons.chat_bubble),
-<<<<<<< HEAD
+          ListTile(
+            leading: const Icon(Icons.chat_bubble),
             title: const Text('Minhas Conversas'),
-=======
-            title: const Text('Conversas'),
->>>>>>> 5065bb2c6c47a97f97a3646b9285333ef13db456
             onTap: () {
               Navigator.pushReplacement(
                 context,
@@ -65,7 +62,6 @@ class Menu extends StatelessWidget {
                 ),
               );
             },
-
           ),
           ListTile(
             leading: const Icon(Icons.exit_to_app_rounded),
@@ -75,7 +71,6 @@ class Menu extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => LoginScreen()),
-                
               );
             },
           ),
