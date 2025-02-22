@@ -1,9 +1,10 @@
-import 'package:auto_hub/helpers/format_number.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:auto_hub/models/cars.dart';
 import 'package:auto_hub/components/menu.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:auto_hub/screens/car_detail_screen.dart';
+import 'package:auto_hub/helpers/format_number.dart';
 
 class HomeScreen extends StatefulWidget {
   final User user;
@@ -15,18 +16,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<Car> listCars = [];
+  List<Car> filteredCars = [];
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   bool isLoading = true;
-
-
-  TextEditingController _minPriceController = TextEditingController();
-  TextEditingController _maxPriceController = TextEditingController();
-  String? _selectedState;
-  List<String> _selectedBrands = [];
-  TextEditingController _searchController =
-      TextEditingController();
-
-  int _crossAxisCount = 2;
+  TextEditingController searchController = TextEditingController();
+  TextEditingController minPriceController = TextEditingController();
+  TextEditingController maxPriceController = TextEditingController();
+  String selectedBrand = '';
 
   @override
   void initState() {
@@ -50,152 +46,130 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     setState(() {
       listCars = temp;
+      filteredCars = temp;
       isLoading = false;
     });
   }
 
-  List<Car> _filterCars() {
-    List<Car> filteredList = listCars;
+  void applyFilters() {
+    List<Car> temp = listCars;
 
-    if (_minPriceController.text.isNotEmpty) {
-      int minPrice = int.tryParse(_minPriceController.text) ?? 0;
-      filteredList =
-          filteredList.where((car) => car.preco >= minPrice).toList();
+    if (minPriceController.text.isNotEmpty) {
+      double minPrice = double.parse(minPriceController.text);
+      temp = temp.where((car) => car.preco >= minPrice).toList();
     }
 
-    if (_maxPriceController.text.isNotEmpty) {
-      int maxPrice = int.tryParse(_maxPriceController.text) ?? 9999999999;
-      filteredList =
-          filteredList.where((car) => car.preco <= maxPrice).toList();
+    if (maxPriceController.text.isNotEmpty) {
+      double maxPrice = double.parse(maxPriceController.text);
+      temp = temp.where((car) => car.preco <= maxPrice).toList();
     }
 
-    if (_selectedState != null) {
-      filteredList =
-          filteredList.where((car) => car.descricao == _selectedState).toList();
+    if (selectedBrand.isNotEmpty) {
+      temp = temp.where((car) => car.marca == selectedBrand).toList();
     }
 
-    if (_selectedBrands.isNotEmpty) {
-      filteredList = filteredList
-          .where((car) => _selectedBrands.contains(car.marca))
-          .toList();
-    }
-
-
-    if (_searchController.text.isNotEmpty) {
-      filteredList = filteredList
-          .where((car) => car.modelo
-              .toLowerCase()
-              .contains(_searchController.text.toLowerCase()))
-          .toList();
-    }
-
-    return filteredList;
-  }
-
-  void _selectState(String state) {
     setState(() {
-      _selectedState = _selectedState == state ? null : state;
+      filteredCars = temp;
     });
   }
 
-  void _toggleBrand(String brand) {
-    setState(() {
-      if (_selectedBrands.contains(brand)) {
-        _selectedBrands.remove(brand);
-      } else {
-        _selectedBrands.add(brand);
-      }
-    });
+  void clearFilters() {
+    minPriceController.clear();
+    maxPriceController.clear();
+    selectedBrand = '';
+    applyFilters();
   }
 
-void _showFiltersDialog() {
+  void showFilterModal() {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (BuildContext context) {
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
           child: Column(
-            mainAxisSize:
-                MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                "Filtros",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              Row(
+                children: [
+                  Text('Filtros', style: TextStyle(fontSize: 20)),
+                ],
               ),
-              const SizedBox(height: 20),
-              const Text(
-                "Preço",
-                style: TextStyle(fontWeight: FontWeight.bold),
+              SizedBox(height: 15),
+              Row(
+                children: [
+                  Text('Preço'),
+                ],
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               TextField(
-                controller: _minPriceController,
-                keyboardType: TextInputType.number,
+                controller: minPriceController,
                 decoration: const InputDecoration(
-                  hintText: "Min",
-                  border: OutlineInputBorder(),
+                  labelText: 'Preço Mínimo',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10))),
                 ),
-                onChanged: (value) => setState(() {}),
+                keyboardType: TextInputType.number,
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 5),
               TextField(
-                controller: _maxPriceController,
-                keyboardType: TextInputType.number,
+                controller: maxPriceController,
                 decoration: const InputDecoration(
-                  hintText: "Max",
-                  border: OutlineInputBorder(),
+                  labelText: 'Preço Máximo',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10))),
                 ),
-                onChanged: (value) => setState(() {}),
+                keyboardType: TextInputType.number,
               ),
-              const SizedBox(height: 20),
-              const Text(
-                "Marcas",
-                style: TextStyle(fontWeight: FontWeight.bold),
+              SizedBox(height: 10),
+              Row(
+                children: [
+                  Text('Marcas'),
+                ],
               ),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                children: ["Honda", "Chevrolet", "Ford"].map((brand) {
-                  return ElevatedButton(
-                    onPressed: () => _toggleBrand(brand),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _selectedBrands.contains(brand)
-                          ? Colors.purple
-                          : Colors.grey[300],
-                    ),
-                    child: Text(
-                      brand,
-                      style: TextStyle(
-                        color: _selectedBrands.contains(brand)
-                            ? Colors.white
-                            : Colors.purple,
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  refresh();
+              DropdownButtonFormField<String>(
+                value: selectedBrand.isEmpty ? null : selectedBrand,
+                decoration: const InputDecoration(),
+                items: listCars
+                    .map((car) => car.marca)
+                    .toSet()
+                    .map((marca) => DropdownMenuItem(
+                          value: marca,
+                          child: Text(marca),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedBrand = value ?? '';
+                  });
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      applyFilters();
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                    ),
+                    child: const Text('Aplicar Filtros',
+                        style: TextStyle(color: Colors.white)),
                   ),
-                ),
-                child: const Text(
-                  "Aplicar Filtros",
-                  style: TextStyle(color: Colors.white),
-                ),
+                  ElevatedButton(
+                    onPressed: () {
+                      clearFilters();
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey,
+                    ),
+                    child: const Text('Limpar Filtros',
+                        style: TextStyle(color: Colors.black87)),
+                  ),
+                ],
               ),
             ],
           ),
@@ -206,50 +180,21 @@ void _showFiltersDialog() {
 
   @override
   Widget build(BuildContext context) {
-    List<Car> filteredCars = _filterCars();
-
     return Scaffold(
       drawer: Menu(user: widget.user),
       appBar: AppBar(
-        title: Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'Pesquisar por modelo...',
-                  border: InputBorder.none,
-                  hintStyle: TextStyle(color: Colors.grey),
-                ),
-                style: TextStyle(color: Colors.black),
-                onChanged: (value) {
-                  setState(() {});
-                },
-              ),
-            ),
-            const SizedBox(width: 10),
-            ElevatedButton(
-              onPressed: _showFiltersDialog,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-              child: const Text(
-                "Filtros",
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
+        title: const Text(
+          'Auto Hub',
+          style: TextStyle(fontSize: 22,fontWeight: FontWeight.w500,color: Color.fromARGB(255, 84, 4, 98) ),
         ),
-        backgroundColor: Colors.white,
+        centerTitle: true,
       ),
       body: Container(
         color: Colors.white,
+        padding: const EdgeInsets.all(8),
         child: isLoading
             ? const Center(child: CircularProgressIndicator())
-            : filteredCars.isEmpty
+            : listCars.isEmpty
                 ? Center(
                     child: Image.asset(
                       'assets/images/logo.png',
@@ -257,216 +202,164 @@ void _showFiltersDialog() {
                       height: 250,
                     ),
                   )
-                : ListView.builder(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                    itemCount: filteredCars.length,
-                    itemBuilder: (context, index) {
-                      Car model = filteredCars[index];
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  OfferDetailsScreen(car: model),
+                : Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: searchController,
+                              decoration: InputDecoration(
+                                hintText: 'Buscar modelo...',
+                                prefixIcon: const Icon(Icons.search),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              onChanged: (value) {
+                                setState(() {});
+                              },
                             ),
-                          );
-                        },
-                        child: Card(
-                          elevation: 5,
-                          margin: const EdgeInsets.symmetric(vertical: 8),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            side: BorderSide(
-                                color: Colors.purple.shade200, width: 4),
                           ),
-                          child: InkWell(
-                            child: Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
+                          const SizedBox(width: 10),
+                          ElevatedButton(
+                            onPressed: showFilterModal,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                            child: const Text(
+                              'Filtros',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 15),
+                      Row(
+                        children: [
+                          Text(
+                            'Últimas ofertas',
+                            style: TextStyle(
+                                color: Colors.purple,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      const Divider(
+                        thickness: 1,
+                        color: Colors.purpleAccent,
+                        indent: 0,
+                      ),
+                      const SizedBox(height: 5),
+                      Expanded(
+                        child: ListView.builder(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 0, vertical: 8),
+                          itemCount: filteredCars
+                              .where((car) => car.modelo.toLowerCase().contains(
+                                  searchController.text.toLowerCase()))
+                              .length,
+                          itemBuilder: (context, index) {
+                            Car model = filteredCars
+                                .where((car) => car.modelo
+                                    .toLowerCase()
+                                    .contains(
+                                        searchController.text.toLowerCase()))
+                                .toList()[index];
+                            return Card(
+                              elevation: 5,
+                              margin: const EdgeInsets.symmetric(vertical: 8),
+                              shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                color: Colors.white,
+                                side: BorderSide(
+                                    color: Colors.purple.shade200, width: 4),
                               ),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  model.imageUrl != null
-                                      ? Image.network(
-                                          model.imageUrl!,
-                                          width: 160,
-                                          height: 120,
-                                          fit: BoxFit.cover,
-                                        )
-                                      : const Icon(
-                                          Icons.image,
-                                          size: 64,
-                                          color: Colors.grey,
-                                        ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${model.modelo}',
-                                          style: const TextStyle(
-                                            color: Colors.purple,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          '${model.marca}',
-                                          style: const TextStyle(
-                                            color: Colors.black87,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                        Text(
-                                          '${formatNumber(model.quilometragem)} Km',
-                                          style: const TextStyle(
-                                            color: Colors.black87,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                        SizedBox(height: 10,),
-                                        const Divider(height: 2),
-                                        SizedBox(height: 10),
-                                        Text(
-                                          ' R\$${formatNumber(model.preco)}',
-                                          style: const TextStyle(
-                                            color: Colors.purple,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          CarDetailScreen(car: model),
                                     ),
+                                  );
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(16),
+                                    color: Colors.white,
                                   ),
-                                ],
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      model.imageUrl != null
+                                          ? Image.network(
+                                              model.imageUrl!,
+                                              width: 120,
+                                              height: 120,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : const Icon(
+                                              Icons.image,
+                                              size: 64,
+                                              color: Colors.grey,
+                                            ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Modelo: ${model.modelo}',
+                                              style: const TextStyle(
+                                                color: Colors.purple,
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              'Marca: ${model.marca}',
+                                              style: const TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            Text(
+                                              'Quilometragem: ${formatNumber(model.quilometragem)} Km',
+                                              style: const TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            Text(
+                                              'Preço: ${formatNumber(model.preco)} R\$',
+                                              style: const TextStyle(
+                                                color: Colors.purple,
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
+                            );
+                          },
                         ),
-                      );
-                    },
+                      ),
+                    ],
                   ),
-      ),
-    );
-  }
-}
-class OfferDetailsScreen extends StatelessWidget {
-  final Car car;
-  const OfferDetailsScreen({super.key, required this.car});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Detalhes do Anúncio'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Centralizando a imagem
-            Center(
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.purple.shade200, width: 3),
-                ),
-                child: car.imageUrl != null
-                    ? Image.network(
-                        car.imageUrl!,
-                        width: 400,
-                        height: 250,
-                        fit: BoxFit.cover,
-                      )
-                    : const Icon(Icons.image, size: 250, color: Colors.grey),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              margin: const EdgeInsets.only(left: 20),
-              child: Text(
-                '${car.modelo} - ',
-                style: TextStyle(
-                    color: Color(0xFF9A007E),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24),
-              ),
-            ),
-            Divider(
-              color: Color(0xFF9A007E),
-              thickness: 2,
-            ),
-            Container(
-              padding: const EdgeInsets.all(5),
-              margin: const EdgeInsets.only(bottom: 8, top: 18),
-              decoration: BoxDecoration(
-                color: Color(0x4C935DCA),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Text(
-                'R\$ ${formatNumber(car.preco)}',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF740376),
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(5),
-              margin: const EdgeInsets.only(top: 12, bottom: 8),
-              decoration: BoxDecoration(
-                color: Color(0x72D999CD),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Text(
-                'Marca: ${car.marca}',
-                style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF9A007E),
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(12),
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(
-                color: Color(0x72D999CD),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Text(
-                'Quilometragem: ${formatNumber(car.quilometragem)} Km',
-                style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF9A007E),
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Color(0x72D999CD),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Text(
-                'Descrição: ${car.descricao ?? "Nenhuma descrição disponível."}',
-                style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF9A007E),
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

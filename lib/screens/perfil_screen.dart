@@ -1,11 +1,13 @@
 import 'dart:typed_data';
 import 'dart:convert';
+import 'package:auto_hub/screens/favorites_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:auto_hub/screens/my_announcements_screen.dart';
+import 'package:auto_hub/components/menu.dart';
 
 class ProfileScreen extends StatefulWidget {
   final User user;
@@ -21,6 +23,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       const AssetImage('assets/images/avatar.png');
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _urlController = TextEditingController();
+  int _favoriteCount = 0;
 
   @override
   void initState() {
@@ -28,6 +31,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _nameController =
         TextEditingController(text: widget.user.displayName ?? 'Usuário');
     _loadAvatarImage();
+    _loadFavoriteCount();
   }
 
   @override
@@ -51,6 +55,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
     }
   }
+
+    void _loadFavoriteCount() async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> snapshot = await _firestore
+          .collection('favorites')
+          .doc(widget.user.uid)
+          .collection('favoriteCars')
+          .get();
+
+      setState(() {
+        _favoriteCount = snapshot.size; // Atualiza a quantidade de favoritos
+      });
+    } catch (e) {
+      print('Erro ao carregar quantidade de favoritos: $e');
+    }
+  }
+
+
+
 
   void _saveAvatarImage(String imagePath) async {
     await _firestore.collection('users').doc(widget.user.uid).set({
@@ -203,19 +226,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: Menu(user: widget.user),
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.purple),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+        title: const Text(
+          'Perfil',
+          style: TextStyle(fontSize: 22, color: Color.fromARGB(255, 84, 4, 98)),
         ),
+        centerTitle: true,
+        elevation: 0,
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
         children: [
           const SizedBox(height: 20),
           Row(
@@ -264,59 +286,77 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const SizedBox(height: 10),
           Padding(
-            padding: const EdgeInsets.only(left: 20.0),
+            padding: const EdgeInsets.only(left: 15.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Email:',
-                      style: TextStyle(fontSize: 16, color: Colors.black54),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        widget.user.email ?? 'sem email',
-                        style: const TextStyle(
-                            fontSize: 16, color: Colors.black54),
-                        textAlign: TextAlign.left,
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Email:',
+                        style: TextStyle(fontSize: 16, color: Colors.black54),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          widget.user.email ?? 'sem email',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.black54,
+                          ),
+                          textAlign: TextAlign.left,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Usuário:',
-                      style: TextStyle(fontSize: 16, color: Colors.black54),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        widget.user.displayName ?? 'Usuário',
-                        style: const TextStyle(
-                            fontSize: 16, color: Colors.black54),
-                        textAlign: TextAlign.left,
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Usuário:',
+                        style: TextStyle(fontSize: 16, color: Colors.black54),
                       ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.purple),
-                      onPressed: () {
-                        _showEditNameDialog();
-                      },
-                    ),
-                  ],
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          widget.user.displayName ?? 'Usuário',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.black54,
+                          ),
+                          textAlign: TextAlign.left,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Colors.purple),
+                        onPressed: () {
+                          _showEditNameDialog();
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-                  const SizedBox(height: 20),
+          const SizedBox(height: 20),
           Padding(
             padding: const EdgeInsets.only(left: 20.0),
             child: Column(
@@ -348,7 +388,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: ElevatedButton(
                     onPressed: () {
-                      // Adicione a funcionalidade do botão "Favoritados 17" aqui
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FavoritesScreen(
+                            user: FirebaseAuth.instance.currentUser!,
+                          ),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.purple[100],
@@ -356,7 +403,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: const Text('Favoritados 17'),
+                    child: Text('Favoritados $_favoriteCount'),
                   ),
                 ),
               ],

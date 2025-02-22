@@ -67,8 +67,9 @@ class _MyAnnouncementsScreenState extends State<MyAnnouncementsScreen> {
       drawer: Menu(user: widget.user),
       appBar: AppBar(
         title: const Text(
-          'Seus Anúncios',
-        ),
+          'Meus Anúncios',
+        style: TextStyle(color: Color.fromARGB(255, 84, 4, 98)),),
+        centerTitle: true,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

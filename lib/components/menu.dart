@@ -1,84 +1,153 @@
 import 'package:auto_hub/screens/chat_screen.dart';
 import 'package:auto_hub/screens/home_screen.dart';
 import 'package:auto_hub/screens/login_screen.dart';
+import 'package:auto_hub/screens/map_screen.dart'; // Importe a MapScreen
 import 'package:auto_hub/screens/perfil_screen.dart';
 import 'package:auto_hub/screens/my_announcements_screen.dart';
+import 'package:auto_hub/screens/favorites_screen.dart';
 import 'package:auto_hub/services/auth_services.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Menu extends StatelessWidget {
+class Menu extends StatefulWidget {
   final User user;
 
   const Menu({super.key, required this.user});
 
   @override
+  State<Menu> createState() => _MenuState();
+}
+
+class _MenuState extends State<Menu> {
+  ImageProvider<Object> _avatarImage =
+      const AssetImage('assets/images/avatar.png');
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAvatarImage();
+  }
+
+  void _loadAvatarImage() async {
+    DocumentSnapshot userDoc =
+        await _firestore.collection('users').doc(widget.user.uid).get();
+    if (userDoc.exists) {
+      String imagePath = userDoc['avatarImage'] ?? 'assets/images/avatar.png';
+      setState(() {
+        if (imagePath.startsWith('http')) {
+          _avatarImage = NetworkImage(imagePath);
+        } else {
+          _avatarImage = AssetImage(imagePath);
+        }
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Drawer(
+      backgroundColor: const Color.fromARGB(255, 239, 231, 240),
       child: ListView(
         children: [
           UserAccountsDrawerHeader(
-            currentAccountPicture: const CircleAvatar(
-              backgroundColor: Colors.white,
-              child: Icon(
-                Icons.manage_accounts_rounded,
-                size: 50,
+            currentAccountPicture: CircleAvatar(
+              backgroundImage: _avatarImage,
+            ),
+            accountName: Text(
+              widget.user.displayName ?? '',
+              style: const TextStyle(
+                color: Colors.white,
               ),
             ),
-            accountName: Text(user.displayName ?? ''),
-            accountEmail: Text(user.email ?? ''),
+            accountEmail: Text(
+              widget.user.email ?? '',
+              style: const TextStyle(
+                color: Colors.white,
+              ),
+            ),
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 121, 6, 141),
+            ),
           ),
           ListTile(
-            leading: const Icon(Icons.home_max_rounded),
+            leading: const Icon(Icons.home_max_rounded, color: Colors.purple),
             title: const Text('Tela inicial'),
             onTap: () {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => HomeScreen(user: user),
+                  builder: (context) => HomeScreen(user: widget.user),
                 ),
               );
             },
           ),
           ListTile(
-            leading: const Icon(Icons.apps_rounded),
+            leading: const Icon(Icons.apps_rounded, color: Colors.purple),
             title: const Text('Seus anúncios'),
             onTap: () {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MyAnnouncementsScreen(user: user),
+                  builder: (context) =>
+                      MyAnnouncementsScreen(user: widget.user),
                 ),
               );
             },
           ),
           ListTile(
-            leading: const Icon(Icons.chat_bubble),
+            leading: const Icon(Icons.chat_bubble, color: Colors.purple),
             title: const Text('Minhas Conversas'),
             onTap: () {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MyChatsScreen(user: user),
-                ),
-              );
-            },
-          ),
-                    ListTile(
-            leading: const Icon(Icons.person),
-            title: const Text('Perfil'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      ProfileScreen( user: user),
+                  builder: (context) => MyChatsScreen(user: widget.user),
                 ),
               );
             },
           ),
           ListTile(
-            leading: const Icon(Icons.exit_to_app_rounded),
+            leading: const Icon(Icons.favorite, color: Colors.purple),
+            title: const Text('Favoritos'),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FavoritesScreen(user: widget.user),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.person, color: Colors.purple),
+            title: const Text('Perfil'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfileScreen(user: widget.user),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.map, color: Colors.purple),
+            title: const Text('Mapa'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      MapScreen(user: widget.user),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading:
+                const Icon(Icons.exit_to_app_rounded, color: Colors.purple),
             title: const Text('Sair'),
             onTap: () async {
               await AuthService().deslogar();
