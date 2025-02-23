@@ -24,8 +24,8 @@ class Car {
       'id': id,
       'modelo': modelo,
       'marca': marca,
-      'quilometragem': quilometragem,
-      'preco': preco,
+      'quilometragem': quilometragem, 
+      'preco': preco, 
       'descricao': descricao,
       'imageUrl': imageUrl,
       'userId': userId,
@@ -37,6 +37,7 @@ class Car {
       id: map['id'],
       modelo: map['modelo'],
       marca: map['marca'],
+
       quilometragem: map['quilometragem'].toDouble(),
       preco: map['preco'].toDouble(),
       descricao: map['descricao'],
@@ -45,3 +46,4 @@ class Car {
     );
   }
 }
+

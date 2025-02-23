@@ -29,6 +29,7 @@ Future<bool> isCarFavorited(String carId) async {
 }
 
 class CarDetailScreen extends StatefulWidget {
+
   final Car car;
 
   const CarDetailScreen({super.key, required this.car});
@@ -62,6 +63,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
         iconTheme: const IconThemeData(color: Colors.purple),
         title: const Text(
           'Detalhes do Anúncio',
+
           style: TextStyle(color: Color.fromARGB(255, 84, 4, 98)),
         ),
       ),
@@ -94,6 +96,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
+
                 color: const Color.fromARGB(141, 202, 95, 221),
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -107,6 +110,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
               ),
             ),
             const SizedBox(height: 8),
+
             _buildInfoTile('Marca', widget.car.marca),
             _buildInfoTile('Quilometragem',
                 '${formatNumber(widget.car.quilometragem)} Km'),

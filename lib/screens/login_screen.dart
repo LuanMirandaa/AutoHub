@@ -169,6 +169,7 @@ class LoginScreen extends StatelessWidget {
                   SizedBox(
                     height: 25,
                   ),
+
                   OutlinedButton(
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(

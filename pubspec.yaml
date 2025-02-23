@@ -81,7 +81,13 @@ flutter:
   - assets/images/mulher1.png
   - assets/images/adolescente.png
   - assets/images/avatar.png
+  - assets/images/photo_add_icon.png
+ 
 
+
+
+  
+  
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 
