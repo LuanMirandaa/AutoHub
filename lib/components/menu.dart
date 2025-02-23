@@ -5,6 +5,7 @@ import 'package:auto_hub/screens/map_screen.dart';
 import 'package:auto_hub/screens/perfil_screen.dart';
 import 'package:auto_hub/screens/my_announcements_screen.dart';
 import 'package:auto_hub/screens/favorites_screen.dart';
+import 'package:auto_hub/screens/financing_screen.dart';
 import 'package:auto_hub/services/auth_services.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -141,6 +142,18 @@ class _MenuState extends State<Menu> {
                 MaterialPageRoute(
                   builder: (context) =>
                       MapScreen(user: widget.user),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.calculate, color: Colors.purple),
+            title: const Text('Simulador Financeiro'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const FinancingScreen(),
                 ),
               );
             },
