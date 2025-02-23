@@ -1,7 +1,7 @@
 import 'package:auto_hub/screens/chat_screen.dart';
 import 'package:auto_hub/screens/home_screen.dart';
 import 'package:auto_hub/screens/login_screen.dart';
-import 'package:auto_hub/screens/map_screen.dart'; // Importe a MapScreen
+import 'package:auto_hub/screens/map_screen.dart'; 
 import 'package:auto_hub/screens/perfil_screen.dart';
 import 'package:auto_hub/screens/my_announcements_screen.dart';
 import 'package:auto_hub/screens/favorites_screen.dart';
@@ -48,7 +48,7 @@ class _MenuState extends State<Menu> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: const Color.fromARGB(255, 239, 231, 240),
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       child: ListView(
         children: [
           UserAccountsDrawerHeader(
@@ -58,17 +58,17 @@ class _MenuState extends State<Menu> {
             accountName: Text(
               widget.user.displayName ?? '',
               style: const TextStyle(
-                color: Colors.white,
+                color: Colors.black,
               ),
             ),
             accountEmail: Text(
               widget.user.email ?? '',
               style: const TextStyle(
-                color: Colors.white,
+                color: Colors.black,
               ),
             ),
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 121, 6, 141),
+              color: const Color.fromARGB(55, 206, 147, 216),
             ),
           ),
           ListTile(

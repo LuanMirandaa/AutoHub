@@ -68,7 +68,8 @@ class _MyAnnouncementsScreenState extends State<MyAnnouncementsScreen> {
       appBar: AppBar(
         title: const Text(
           'Meus Anúncios',
-        style: TextStyle(color: Color.fromARGB(255, 84, 4, 98)),),
+          style: TextStyle(color: Color.fromARGB(255, 84, 4, 98)),
+        ),
         centerTitle: true,
       ),
       floatingActionButton: FloatingActionButton(
@@ -308,8 +309,11 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:
-            Text(widget.car == null ? 'Adicionar Anúncio' : 'Editar Anúncio'),
+        title: Text(
+          widget.car == null ? 'Adicionar Anúncio' : 'Editar Anúncio',
+          style: TextStyle(color: Color.fromARGB(255, 84, 4, 98)),
+        ),
+        centerTitle: true,
       ),
       body: Container(
         color: Colors.white,
@@ -320,8 +324,8 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
               Container(
                 height: 350,
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.purple.shade200, width: 4),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: Colors.purple, width: 4),
                     color: Colors.white),
                 child: Image.memory(
                   imageData!,
@@ -332,8 +336,8 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
               Container(
                 height: 350,
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.purple.shade200, width: 4),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: Colors.purple, width: 4),
                     color: Colors.white),
                 child: Image.network(
                   imageUrl!,
@@ -344,9 +348,8 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
               Container(
                   height: 350,
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border:
-                          Border.all(color: Colors.purple.shade200, width: 4),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: Colors.purple, width: 4),
                       color: Colors.white),
                   child: Image.asset('assets/images/photo_add_icon.png')),
             const SizedBox(height: 30),
@@ -357,10 +360,13 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
                   labelText: 'Modelo',
                   labelStyle:
                       TextStyle(color: Color.fromARGB(225, 117, 117, 117)),
-                  border: OutlineInputBorder(
+                  focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(
                           color: Color.fromARGB(255, 206, 147, 216),
                           width: 2.0),
+                      borderRadius: BorderRadius.all(Radius.circular(10))),
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.purple, width: 2.0),
                       borderRadius: BorderRadius.all(Radius.circular(10)))),
             ),
             const SizedBox(height: 15),
@@ -370,10 +376,13 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
                   labelText: 'Marca',
                   labelStyle:
                       TextStyle(color: Color.fromARGB(225, 117, 117, 117)),
-                  border: OutlineInputBorder(
+                  focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(
                           color: Color.fromARGB(255, 206, 147, 216),
                           width: 2.0),
+                      borderRadius: BorderRadius.all(Radius.circular(10))),
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.purple, width: 2.0),
                       borderRadius: BorderRadius.all(Radius.circular(10)))),
             ),
             const SizedBox(height: 15),
@@ -382,15 +391,17 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
               keyboardType: TextInputType.number,
               inputFormatters: [ThousandsFormatter()],
               decoration: const InputDecoration(
-                labelText: 'Quilometragem (km)',
-                labelStyle:
-                    TextStyle(color: Color.fromARGB(225, 117, 117, 117)),
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: Color.fromARGB(255, 206, 147, 216), width: 2.0),
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-              ),
+                  labelText: 'Quilometragem (km)',
+                  labelStyle:
+                      TextStyle(color: Color.fromARGB(225, 117, 117, 117)),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                        color: Color.fromARGB(255, 206, 147, 216), width: 2.0),
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.purple, width: 2.0),
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
             ),
             const SizedBox(height: 15),
             TextField(
@@ -398,15 +409,17 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
               keyboardType: TextInputType.number,
               inputFormatters: [ThousandsFormatter()],
               decoration: const InputDecoration(
-                labelText: 'Preço (R\$)',
-                labelStyle:
-                    TextStyle(color: Color.fromARGB(225, 117, 117, 117)),
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: Color.fromARGB(255, 206, 147, 216), width: 2.0),
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-              ),
+                  labelText: 'Preço (R\$)',
+                  labelStyle:
+                      TextStyle(color: Color.fromARGB(225, 117, 117, 117)),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                        color: Color.fromARGB(255, 206, 147, 216), width: 2.0),
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.purple, width: 2.0),
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
             ),
             const SizedBox(height: 15),
             TextField(
@@ -415,10 +428,13 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
                   labelText: 'Descrição',
                   labelStyle:
                       TextStyle(color: Color.fromARGB(225, 117, 117, 117)),
-                  border: OutlineInputBorder(
+                  focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(
                           color: Color.fromARGB(255, 206, 147, 216),
                           width: 2.0),
+                      borderRadius: BorderRadius.all(Radius.circular(10))),
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.purple, width: 2.0),
                       borderRadius: BorderRadius.all(Radius.circular(10)))),
             ),
             const SizedBox(height: 30),
@@ -452,7 +468,7 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
               height: 45,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(151, 141, 11, 201),
+                  backgroundColor: Colors.purple,
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),

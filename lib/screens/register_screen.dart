@@ -43,12 +43,22 @@ class RegisterScreen extends StatelessWidget {
                       TextFormField(
                         controller: _nomeController,
                         decoration: const InputDecoration(
-                          hintText: 'Nome',
-                          hintStyle: TextStyle(
+                          labelText: 'Nome',
+                          labelStyle: TextStyle(
                               color: Color.fromARGB(255, 117, 117, 117)),
+                          suffixIcon: Icon(Icons.person_outline),
                           border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
                                 color: Color.fromARGB(255, 206, 147, 216),
+                                width: 2.0),
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Colors.purple,
                                 width: 2.0),
                             borderRadius: BorderRadius.all(Radius.circular(10)),
                           ),
@@ -67,9 +77,19 @@ class RegisterScreen extends StatelessWidget {
                           hintText: 'E-mail',
                           hintStyle: TextStyle(
                               color: Color.fromARGB(255, 117, 117, 117)),
+                          suffixIcon: Icon(Icons.email_outlined),
                           border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
                                 color: Color.fromARGB(255, 206, 147, 216),
+                                width: 2.0),
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Colors.purple,
                                 width: 2.0),
                             borderRadius: BorderRadius.all(Radius.circular(10)),
                           ),
@@ -93,9 +113,19 @@ class RegisterScreen extends StatelessWidget {
                           hintText: 'Senha',
                           hintStyle: TextStyle(
                               color: Color.fromARGB(255, 117, 117, 117)),
+                          suffixIcon: Icon(Icons.password_outlined),
                           border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
                                 color: Color.fromARGB(255, 206, 147, 216),
+                                width: 2.0),
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Colors.purple,
                                 width: 2.0),
                             borderRadius: BorderRadius.all(Radius.circular(10)),
                           ),
@@ -117,12 +147,23 @@ class RegisterScreen extends StatelessWidget {
                           hintText: 'Confirmar Senha',
                           hintStyle: TextStyle(
                               color: Color.fromARGB(255, 117, 117, 117)),
+                          suffixIcon: Icon(Icons.password_outlined),
                           border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
                                 color: Color.fromARGB(255, 206, 147, 216),
                                 width: 2.0),
                             borderRadius: BorderRadius.all(Radius.circular(10)),
                           ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Colors.purple,
+                                width: 2.0),
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                          ),
+                        
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -140,7 +181,7 @@ class RegisterScreen extends StatelessWidget {
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
-                                const Color.fromARGB(151, 141, 11, 201),
+                                Colors.purple,
                             shape: const RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10)),

@@ -376,12 +376,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple[100],
+                      backgroundColor: Colors.purple[200],
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: const Text('Meus anúncios 23'),
+                    child: const Text('Meus anúncios'),
                   ),
                 ),
                 Padding(
@@ -398,12 +398,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple[100],
+                      backgroundColor: Colors.purple[200],
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: Text('Favoritados $_favoriteCount'),
+                    child: Text('Favoritados $_favoriteCount',),
                   ),
                 ),
               ],

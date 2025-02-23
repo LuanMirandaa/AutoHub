@@ -29,7 +29,6 @@ Future<bool> isCarFavorited(String carId) async {
 }
 
 class CarDetailScreen extends StatefulWidget {
-
   final Car car;
 
   const CarDetailScreen({super.key, required this.car});
@@ -63,9 +62,9 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
         iconTheme: const IconThemeData(color: Colors.purple),
         title: const Text(
           'Detalhes do Anúncio',
-
           style: TextStyle(color: Color.fromARGB(255, 84, 4, 98)),
         ),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -88,15 +87,14 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
               style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: Color.fromARGB(255, 84, 4, 98),
+                color: Colors.purple,
               ),
             ),
-            const Divider(color: Color.fromARGB(255, 78, 0, 92), thickness: 1),
+            const Divider(color: Colors.purpleAccent, thickness: 1),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-
                 color: const Color.fromARGB(141, 202, 95, 221),
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -105,12 +103,11 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w900,
-                  color: Color.fromARGB(255, 69, 4, 80),
+                  color: Colors.purple,
                 ),
               ),
             ),
             const SizedBox(height: 8),
-
             _buildInfoTile('Marca', widget.car.marca),
             _buildInfoTile('Quilometragem',
                 '${formatNumber(widget.car.quilometragem)} Km'),
@@ -207,9 +204,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                 child: Icon(
                   Icons.favorite,
                   size: 25,
-                  color: isFavorited
-                      ? const Color.fromARGB(255, 64, 7, 73)
-                      : Colors.white,
+                  color: isFavorited ? Colors.purple : Colors.white,
                 ),
               ),
             ),
@@ -230,7 +225,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(251, 121, 2, 142),
+                    backgroundColor: Colors.purple,
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     shape: RoundedRectangleBorder(
@@ -264,7 +259,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
           style: const TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 18,
-            color: Color.fromARGB(255, 105, 26, 142),
+            color: Colors.purple,
           ),
         ),
       ),
