@@ -201,6 +201,8 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
             TextField(
               controller: localizacaoController,
               decoration: const InputDecoration(
+                hintText: 'Ex: São Paulo, SP',
+                hintStyle: TextStyle(color: Colors.grey),
                 labelText: 'Localização',
                 labelStyle:
                     TextStyle(color: Color.fromARGB(225, 117, 117, 117)),

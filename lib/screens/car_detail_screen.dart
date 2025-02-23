@@ -59,7 +59,6 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
-       
         title: const Text(
           'Detalhes do Anúncio',
           style: TextStyle(color: Color.fromARGB(255, 84, 4, 98)),
