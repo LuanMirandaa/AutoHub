@@ -182,7 +182,7 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
               child: OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(
-                      color: Color.fromARGB(255, 206, 147, 216), width: 2),
+                      color: Colors.purple, width: 2),
                   backgroundColor: Colors.white,
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -191,11 +191,11 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
                 onPressed: selectImage,
                 icon: const Icon(
                   Icons.image,
-                  color: Color.fromARGB(255, 206, 147, 216),
+                  color: Colors.purple,
                 ),
                 label: const Text('Selecionar Imagem',
                     style: TextStyle(
-                      color: Color.fromARGB(255, 206, 147, 216),
+                      color: Colors.purple,
                       fontSize: 15,
                     )),
               ),

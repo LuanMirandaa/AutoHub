@@ -155,7 +155,7 @@ class LoginScreen extends StatelessWidget {
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(
-                            color: Color.fromARGB(255, 206, 147, 216),
+                            color: Colors.purple,
                             width: 2),
                         backgroundColor: Colors.white,
                         shape: const RoundedRectangleBorder(
@@ -171,7 +171,7 @@ class LoginScreen extends StatelessWidget {
                       },
                       child: Text('Cadastrar-se',
                           style: TextStyle(
-                              color: Color.fromARGB(255, 206, 147, 216),
+                              color: Colors.purple,
                               fontSize: 15)),
                     ),
                   ),
@@ -190,7 +190,7 @@ class LoginScreen extends StatelessWidget {
                   OutlinedButton(
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(
-                          color: Color.fromARGB(255, 206, 147, 216),
+                          color: Colors.purple,
                         ),
                         backgroundColor: Colors.white,
                         shape: const RoundedRectangleBorder(

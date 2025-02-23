@@ -80,9 +80,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Redefinir Senha'),
-        backgroundColor: const Color(0xFF993399),
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: Container(
         color: Colors.white,
@@ -105,8 +104,23 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     labelText: 'E-mail',
-                    prefixIcon: const Icon(Icons.email_outlined),
+                    labelStyle: TextStyle(color: Colors.grey[600]),
+                    suffixIcon: const Icon(Icons.email_outlined),
                     border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(255, 206, 147, 216),
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.purple,
+                        width: 2,
+                      ),
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
@@ -125,7 +139,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   height: 50,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF993399),
+                      backgroundColor: Colors.purple,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -140,7 +154,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                             ),
                           )
-                        : const Text('Enviar'),
+                        : const Text('Enviar', style: TextStyle(fontSize: 15)), 
                   ),
                 ),
               ],

@@ -225,9 +225,10 @@ class _FinancingScreenState extends State<FinancingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
-          'Simulador Financeiro',
+          'Simulador de Financiamento',
           style: TextStyle(color: Color.fromARGB(255, 84, 4, 98)),
         ),
         centerTitle: true,
@@ -241,7 +242,7 @@ class _FinancingScreenState extends State<FinancingScreen> {
               Card(
                 elevation: 4,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                   side: BorderSide(color: Colors.purple.shade200),
                 ),
                 child: Padding(
@@ -287,13 +288,17 @@ class _FinancingScreenState extends State<FinancingScreen> {
               ],
               decoration: InputDecoration(
                 labelText: 'Valor do Veículo (R\$)',
+                labelStyle: TextStyle(color: Colors.grey[600]),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.purple.shade400),
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.purple.shade200, width: 2),
                 ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.purple, width: 2),)
               ),
             ),
             const SizedBox(height: 16),
@@ -313,13 +318,18 @@ class _FinancingScreenState extends State<FinancingScreen> {
               ],
               decoration: InputDecoration(
                 labelText: 'Entrada (R\$)',
+                labelStyle: TextStyle(color: Colors.grey[600]),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.purple.shade400),
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.purple.shade200, width: 2),
+                
                 ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.purple, width: 2),)
               ),
             ),
             const SizedBox(height: 16),
@@ -332,15 +342,22 @@ class _FinancingScreenState extends State<FinancingScreen> {
               ],
               decoration: InputDecoration(
                 labelText: 'Prazo (meses)',
+                labelStyle: TextStyle(color: Colors.grey[600]),
                 hintText: 'Ex: 48',
+                hintStyle: TextStyle(color: Colors.grey[600]),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.purple.shade200, width: 2),
+                ),
+                enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.purple.shade400),
+                  borderSide: BorderSide(color: Colors.purple, width: 2),
                 ),
                 suffixText: 'meses',
+                suffixStyle: TextStyle(color: Colors.grey[600]),
               ),
             ),
             const SizedBox(height: 16),
@@ -354,15 +371,22 @@ class _FinancingScreenState extends State<FinancingScreen> {
               ],
               decoration: InputDecoration(
                 labelText: 'Taxa de Juros Mensal',
+                labelStyle: TextStyle(color: Colors.grey[600]),
                 hintText: 'Ex: 1,5',
+                hintStyle: TextStyle(color: Colors.grey[600]),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.purple.shade400),
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.purple.shade200, width: 2),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.purple, width: 2),
                 ),
                 suffixText: '%',
+                suffixStyle: TextStyle(color: Colors.grey[600]),
               ),
             ),
             const SizedBox(height: 24),
@@ -372,10 +396,10 @@ class _FinancingScreenState extends State<FinancingScreen> {
                   child: ElevatedButton(
                     onPressed: calculateMonthlyPayment,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF993399),
+                      backgroundColor: Colors.purple,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     child: const Text(
@@ -389,10 +413,10 @@ class _FinancingScreenState extends State<FinancingScreen> {
                   child: ElevatedButton(
                     onPressed: monthlyPayment > 0 ? saveSimulation : null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF993399),
+                      backgroundColor: Colors.purple,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     child: const Text(
@@ -408,7 +432,7 @@ class _FinancingScreenState extends State<FinancingScreen> {
               Card(
                 elevation: 4,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                   side: BorderSide(color: Colors.purple.shade200),
                 ),
                 child: Container(
@@ -421,7 +445,7 @@ class _FinancingScreenState extends State<FinancingScreen> {
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF993399),
+                          color: Colors.purple,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -438,7 +462,7 @@ class _FinancingScreenState extends State<FinancingScreen> {
                         'em ${monthsController.text} pagamentos',
                         style: const TextStyle(
                           fontSize: 20,
-                          color: Color(0xFF993399),
+                          color: Colors.purple,
                         ),
                       ),
                     ],

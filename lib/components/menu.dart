@@ -59,17 +59,17 @@ class _MenuState extends State<Menu> {
             accountName: Text(
               widget.user.displayName ?? '',
               style: const TextStyle(
-                color: Colors.black,
+                color: Colors.white,
               ),
             ),
             accountEmail: Text(
               widget.user.email ?? '',
               style: const TextStyle(
-                color: Colors.black,
+                color: Colors.white,
               ),
             ),
             decoration: BoxDecoration(
-              color: const Color.fromARGB(55, 206, 147, 216),
+              color: Colors.purple,
             ),
           ),
           ListTile(
@@ -148,7 +148,7 @@ class _MenuState extends State<Menu> {
           ),
           ListTile(
             leading: const Icon(Icons.calculate, color: Colors.purple),
-            title: const Text('Simulador Financeiro'),
+            title: const Text('Simulador de Financiamento'),
             onTap: () {
               Navigator.push(
                 context,
