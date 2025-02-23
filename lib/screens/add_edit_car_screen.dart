@@ -29,10 +29,15 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
   final TextEditingController marcaController = TextEditingController();
   final TextEditingController quilometragemController = TextEditingController();
   final TextEditingController precoController = TextEditingController();
+  final TextEditingController localizacaoController = TextEditingController();
+
   final TextEditingController descricaoController = TextEditingController();
 
   Uint8List? imageData;
   String? imageUrl;
+  String? estado;
+
+  final List<String> status = ['Novo', 'Seminovo', 'Usado'];
 
   @override
   void initState() {
@@ -40,8 +45,10 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
     if (widget.car != null) {
       modeloController.text = widget.car!.modelo;
       marcaController.text = widget.car!.marca;
+      estado = widget.car!.estado;
       quilometragemController.text = widget.car!.quilometragem.toString();
       precoController.text = widget.car!.preco.toString();
+      localizacaoController.text = widget.car!.localizacao ?? '';
       descricaoController.text = widget.car!.descricao ?? '';
       imageUrl = widget.car!.imageUrl;
     }
@@ -109,7 +116,8 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
                       borderRadius: BorderRadius.all(Radius.circular(10))),
                   enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.purple, width: 2.0),
-                      borderRadius: BorderRadius.all(Radius.circular(10)))),),
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+            ),
             const SizedBox(height: 15),
             TextField(
               controller: marcaController,
@@ -124,7 +132,35 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
                       borderRadius: BorderRadius.all(Radius.circular(10))),
                   enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.purple, width: 2.0),
-                      borderRadius: BorderRadius.all(Radius.circular(10)))),),
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+            ),
+            const SizedBox(height: 15),
+            DropdownButtonFormField<String>(
+              value: estado,
+              decoration: const InputDecoration(
+                labelText: 'Estado',
+                labelStyle:
+                    TextStyle(color: Color.fromARGB(225, 117, 117, 117)),
+                focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                        color: Color.fromARGB(255, 206, 147, 216), width: 2.0),
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.purple, width: 2.0),
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+              ),
+              items: status.map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  estado = newValue;
+                });
+              },
+            ),
             const SizedBox(height: 15),
             TextField(
               controller: quilometragemController,
@@ -141,7 +177,8 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
                   ),
                   enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.purple, width: 2.0),
-                      borderRadius: BorderRadius.all(Radius.circular(10)))),),
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+            ),
             const SizedBox(height: 15),
             TextField(
               controller: precoController,
@@ -158,7 +195,24 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
                   ),
                   enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.purple, width: 2.0),
-                      borderRadius: BorderRadius.all(Radius.circular(10)))),),
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+            ),
+            const SizedBox(height: 15),
+            TextField(
+              controller: localizacaoController,
+              decoration: const InputDecoration(
+                labelText: 'Localização',
+                labelStyle:
+                    TextStyle(color: Color.fromARGB(225, 117, 117, 117)),
+                focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                        color: Color.fromARGB(255, 206, 147, 216), width: 2.0),
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.purple, width: 2.0),
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+              ),
+            ),
             const SizedBox(height: 15),
             TextField(
               controller: descricaoController,
@@ -181,8 +235,7 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
               height: 45,
               child: OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
-                  side: BorderSide(
-                      color: Colors.purple, width: 2),
+                  side: BorderSide(color: Colors.purple, width: 2),
                   backgroundColor: Colors.white,
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -277,6 +330,8 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
       marca: marcaController.text,
       quilometragem: quilometragem,
       preco: preco,
+      localizacao: localizacaoController.text,
+      estado: estado!,
       descricao:
           descricaoController.text.isNotEmpty ? descricaoController.text : null,
       imageUrl: uploadedImageUrl ?? imageUrl,
