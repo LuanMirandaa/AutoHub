@@ -1,4 +1,5 @@
 import 'package:auto_hub/screens/register_screen.dart';
+import 'package:auto_hub/screens/reset_password_screen.dart';
 import 'package:auto_hub/services/auth_services.dart';
 import 'package:flutter/material.dart';
 
@@ -97,7 +98,14 @@ class LoginScreen extends StatelessWidget {
                     textDirection: TextDirection.rtl,
                     children: [
                       TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ResetPasswordScreen(),
+                              ),
+                            );
+                          },
                           child: Text(
                             'Esqueci minha senha',
                             style: TextStyle(
