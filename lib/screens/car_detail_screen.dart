@@ -1,4 +1,6 @@
+
 import 'package:auto_hub/screens/chat_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -215,15 +217,8 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                 width: 1920,
                 height: 45,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MyChatsScreen(
-                          user: FirebaseAuth.instance.currentUser!,
-                        ),
-                      ),
-                    );
+                  onPressed: () async{
+                     await _startChat(context);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.purple,
@@ -266,4 +261,61 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
       ),
     );
   }
+
+  Future<void> _startChat(BuildContext context) async {
+  final otherUserId = widget.car.userId; // ID do dono do anúncio
+  final currentUserId = await getCurrentUserId(); // ID do usuário logado
+
+  if (currentUserId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Você precisa estar logado para iniciar um chat!')),
+      );
+      return;
+    }
+
+  if (otherUserId == currentUserId) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Você não pode iniciar um chat consigo mesmo!')),
+    );
+    return;
+  }
+
+  // Gera um ID único para o chat
+  final chatId = _generateChatId(currentUserId as String, otherUserId);
+
+  // Verifica se o chat já existe no Firestore
+  final chatSnapshot = await FirebaseFirestore.instance
+      .collection('chats')
+      .doc(chatId)
+      .get();
+
+  if (!chatSnapshot.exists) {
+    // Se o chat não existir, cria um novo
+    await FirebaseFirestore.instance.collection('chats').doc(chatId).set({
+      'participants': [currentUserId, otherUserId],
+      'lastMessage': '',
+      'lastMessageTimestamp': FieldValue.serverTimestamp(),
+    });
+  }
+
+  // Navega para a tela do chat
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => ChatScreen(
+        user: FirebaseAuth.instance.currentUser!,
+        chatId: chatId,
+        currentUserId: currentUserId as String,
+        otherUserId: otherUserId,
+      ),
+    ),
+  );
+}
+
+// Função para gerar um ID único baseado nos participantes do chat
+String _generateChatId(String userId1, String userId2) {
+  final sortedIds = [userId1, userId2]..sort();
+  return sortedIds.join('_');
+}
+
 }

@@ -27,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _storeCurrentUserData();
     refresh();
   }
 
@@ -50,6 +51,40 @@ class _HomeScreenState extends State<HomeScreen> {
       isLoading = false;
     });
   }
+
+  Future<void> _storeCurrentUserData() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      // Só salva os dados se o usuário ainda não estiver no Firestore
+      if (!userDoc.exists) {
+        await storeUserData(
+          user.uid,
+          user.email ?? '',
+          user.displayName ?? 'Anonymous',
+        );
+        debugPrint('Dados do usuário salvos com sucesso!');
+      } else {
+        debugPrint('Usuário já existe no Firestore.');
+      }
+    } else {
+      debugPrint('Nenhum usuário logado.');
+    }
+  }
+
+  Future<void> storeUserData(String uid, String email, String name) async {
+  await FirebaseFirestore.instance.collection('users').doc(uid).set({
+    'uid': uid,
+    'email': email,
+    'name': name,
+    'avatarImage': 'assets/images/avatar.png'
+  });
+}
 
   void applyFilters() {
     List<Car> temp = listCars;

@@ -1,4 +1,4 @@
-import 'package:auto_hub/screens/chat_screen.dart';
+import 'package:auto_hub/screens/chat_list.dart';
 import 'package:auto_hub/screens/home_screen.dart';
 import 'package:auto_hub/screens/login_screen.dart';
 import 'package:auto_hub/screens/map_screen.dart'; 
@@ -104,7 +104,7 @@ class _MenuState extends State<Menu> {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MyChatsScreen(user: widget.user),
+                  builder: (context) => ChatListScreen(user: widget.user,),
                 ),
               );
             },
