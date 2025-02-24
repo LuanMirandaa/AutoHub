@@ -65,7 +65,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           .get();
 
       setState(() {
-        _favoriteCount = snapshot.size; // Atualiza a quantidade de favoritos
+        _favoriteCount = snapshot.size;
       });
     } catch (e) {
       print('Erro ao carregar quantidade de favoritos: $e');

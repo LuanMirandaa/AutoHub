@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:auto_hub/models/cars.dart';
 import 'package:auto_hub/helpers/format_number.dart';
-import 'package:auto_hub/screens/favorites_screen.dart';
 
 Future<String?> getCurrentUserId() async {
   User? user = FirebaseAuth.instance.currentUser;
