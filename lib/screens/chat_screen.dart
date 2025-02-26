@@ -23,35 +23,12 @@ class ChatScreen extends StatefulWidget {
 class __ChatScreenState extends State<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   final TextEditingController _editMessageController = TextEditingController();
-  //final CollectionReference _messages = FirebaseFirestore.instance.collection("messages");
-  //final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
-  //final String currentUserName = FirebaseAuth.instance.currentUser!.displayName!;
   String? _editingMessageId;
   String? otherUserName;
+  ImageProvider? otherUserAvatar;
 
 
 
-  //String currentMessage = "";
-
-  // void _sendMessage() async {
-  //   if (textController.text.trim().isEmpty) return;
-
-  //   if (_editingMessageId == null) {
-  //     await _messages.add({
-  //       'text': textController.text,
-  //       'senderId': currentUserId,
-  //       'senderName': currentUserName,
-  //       'timestamp': FieldValue.serverTimestamp(),
-  //     });
-  //   } else {
-  //     await _messages.doc(_editingMessageId).update({
-  //       'text': textController.text,
-  //     });
-  //     _editingMessageId = null;
-  //   }
-
-  //   textController.clear();
-  // }
 
   void _sendMessage() {
     final message = _messageController.text.trim();
@@ -71,9 +48,6 @@ class __ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  // void _deleteMessage(String messageId) async {
-  //   await _messages.doc(messageId).delete();
-  // }
 
   void _deleteMessage(String messageId) {
     FirebaseFirestore.instance
@@ -84,12 +58,6 @@ class __ChatScreenState extends State<ChatScreen> {
         .update({'isDeleted': true});
   }
 
-  // void _editMessage(String messageId, String currentText) {
-  //   setState(() {
-  //     _editingMessageId = messageId;
-  //     textController.text = currentText;
-  //   });
-  // }
 
   void _startEditingMessage(String messageId, String currentMessage) {
     setState(() {
@@ -116,17 +84,6 @@ class __ChatScreenState extends State<ChatScreen> {
       });
     }
   }
-
-  // Stream<List<String>> messagesStream() {
-  //   return FirebaseFirestore.instance
-  //       .collection("messages")
-  //       .snapshots()
-  //       .map((snapshot) {
-  //     final messages =
-  //         snapshot.docs.map((e) => e["messages"] as String).toList();
-  //     return messages;
-  //   });
-  // }
 
   void _showMessageOptions(
       BuildContext context, String messageId, String currentMessage) {
@@ -194,12 +151,10 @@ class __ChatScreenState extends State<ChatScreen> {
    @override
   void initState() {
     super.initState();
-    // Inicializando a variável com base no widget.title
-    //otherUserName = FirebaseFirestore.instance.collection('users').doc(widget.otherUserId).get().toString();
-    _fetchUserName();
+    _fetchUserData();
   }
 
-  Future<void> _fetchUserName() async {
+  Future<void> _fetchUserData() async {
     try {
     final snapshot = await FirebaseFirestore.instance
         .collection('users')
@@ -209,6 +164,10 @@ class __ChatScreenState extends State<ChatScreen> {
     if (snapshot.exists && snapshot.data() != null) {
       final userData = snapshot.data() as Map<String, dynamic>;
       final name = userData['name'] as String?;
+      otherUserAvatar = userData['avatarImage'] != null &&
+                              userData['avatarImage']!.isNotEmpty
+                          ? NetworkImage(userData['avatarImage'])
+                          : AssetImage('assets/images/avatar.png');
       
       if (name != null && name.isNotEmpty) {
         setState(() {
@@ -234,19 +193,38 @@ class __ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //resizeToAvoidBottomInset: true,
       drawer: (Menu(user: widget.user)),
       appBar: AppBar(
-        title: Text(
-    otherUserName ?? 'Carregando...',
+  leading: Builder(
+    builder: (context) => IconButton(
+      icon: const Icon(Icons.menu),
+      onPressed: () {
+        Scaffold.of(context).openDrawer();
+      },
+    ),
   ),
+  title: Row(
+    children: [
+      CircleAvatar(
+        backgroundImage: otherUserAvatar,
+        radius: 18,
       ),
+      const SizedBox(width: 8), // Espaço entre avatar e nome
+      Expanded(
+        child: Text(
+          otherUserName ?? 'Carregando...',
+          overflow: TextOverflow.ellipsis, // Evita sobreposição
+          style: const TextStyle(fontSize: 18),
+        ),
+      ),
+    ],
+  ),
+),
       body: Column(
         children: [
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream:
-                  //_messages.orderBy('timestamp', descending: true).snapshots(),
                   FirebaseFirestore.instance
                       .collection('chats')
                       .doc(widget.chatId)
