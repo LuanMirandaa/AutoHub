@@ -193,6 +193,7 @@ class __ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       drawer: (Menu(user: widget.user)),
       appBar: AppBar(
   leading: Builder(
@@ -347,12 +348,15 @@ class __ChatScreenState extends State<ChatScreen> {
                     controller: _messageController,
                     decoration: const InputDecoration(
                       hintText: 'Digite a mensagem...',
-                      border: OutlineInputBorder(),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10))
+                      ),
                     ),
                   ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.send),
+                  color: Colors.purple[200],
                   onPressed: _sendMessage,
                 ),
               ],

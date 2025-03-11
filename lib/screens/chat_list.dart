@@ -30,10 +30,13 @@ class __ChatListScreenState extends State<ChatListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      
       drawer: (Menu(user: widget.user)),
       appBar: AppBar(
-        title: const Text('Conversas'),
+        title: const Text('Conversas', style: TextStyle(color: Color.fromARGB(255, 84, 4, 98))),
+        centerTitle: true,
       ),
+      backgroundColor: Colors.white,
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('chats')

@@ -198,7 +198,7 @@ class FilialSearchDelegate extends SearchDelegate<String> {
           title: Text(filial.nome),
           subtitle: Text(filial.localizacao),
           onTap: () {
-            close(context, filial.localizacao);
+           
           },
         );
       },
@@ -221,8 +221,7 @@ class FilialSearchDelegate extends SearchDelegate<String> {
           title: Text(filial.nome),
           subtitle: Text(filial.localizacao),
           onTap: () {
-            query = filial.localizacao;
-            showResults(context);
+           
           },
         );
       },

@@ -86,7 +86,7 @@ class _MenuState extends State<Menu> {
           ),
           ListTile(
             leading: const Icon(Icons.apps_rounded, color: Colors.purple),
-            title: const Text('Seus anúncios'),
+            title: const Text('Meus anúncios'),
             onTap: () {
               Navigator.pushReplacement(
                 context,
@@ -99,7 +99,7 @@ class _MenuState extends State<Menu> {
           ),
           ListTile(
             leading: const Icon(Icons.chat_bubble, color: Colors.purple),
-            title: const Text('Minhas Conversas'),
+            title: const Text('Minhas conversas'),
             onTap: () {
               Navigator.pushReplacement(
                 context,
@@ -148,7 +148,7 @@ class _MenuState extends State<Menu> {
           ),
           ListTile(
             leading: const Icon(Icons.calculate, color: Colors.purple),
-            title: const Text('Simulador de Financiamento'),
+            title: const Text('Simulador de financiamento'),
             onTap: () {
               Navigator.push(
                 context,
