@@ -110,7 +110,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
             ),
             const SizedBox(height: 8),
             _buildInfoTile('Marca', widget.car.marca),
-            _buildInfoTile('Estado', widget.car.estado),
+            _buildInfoTile('Condição', widget.car.condicao),
             _buildInfoTile('Quilometragem',
                 '${formatNumber(widget.car.quilometragem)} Km'),
             _buildInfoTile('Localização', widget.car.localizacao),

@@ -35,7 +35,7 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
 
   Uint8List? imageData;
   String? imageUrl;
-  String? estado;
+  String? condicao;
 
   final List<String> status = ['Novo', 'Seminovo', 'Usado'];
 
@@ -45,7 +45,7 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
     if (widget.car != null) {
       modeloController.text = widget.car!.modelo;
       marcaController.text = widget.car!.marca;
-      estado = widget.car!.estado;
+      condicao = widget.car!.condicao;
       quilometragemController.text = widget.car!.quilometragem.toString();
       precoController.text = widget.car!.preco.toString();
       localizacaoController.text = widget.car!.localizacao ?? '';
@@ -136,9 +136,9 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
             ),
             const SizedBox(height: 15),
             DropdownButtonFormField<String>(
-              value: estado,
+              value: condicao,
               decoration: const InputDecoration(
-                labelText: 'Estado',
+                labelText: 'Condicão',
                 labelStyle:
                     TextStyle(color: Color.fromARGB(225, 117, 117, 117)),
                 focusedBorder: OutlineInputBorder(
@@ -157,7 +157,7 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
               }).toList(),
               onChanged: (String? newValue) {
                 setState(() {
-                  estado = newValue;
+                  condicao = newValue;
                 });
               },
             ),
@@ -333,7 +333,7 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
       quilometragem: quilometragem,
       preco: preco,
       localizacao: localizacaoController.text,
-      estado: estado!,
+      condicao: condicao!,
       descricao:
           descricaoController.text.isNotEmpty ? descricaoController.text : null,
       imageUrl: uploadedImageUrl ?? imageUrl,

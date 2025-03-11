@@ -135,7 +135,7 @@ class _MenuState extends State<Menu> {
           ),
           ListTile(
             leading: const Icon(Icons.map, color: Colors.purple),
-            title: const Text('Mapa'),
+            title: const Text('Mapa das filiais'),
             onTap: () {
               Navigator.push(
                 context,
