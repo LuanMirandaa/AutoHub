@@ -32,14 +32,19 @@ class LoginScreen extends StatelessWidget {
                   ),
                   Text(
                     'Bem-vindo ao AutoHub',
-                    style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold, color: Colors.black87),
+                    style: TextStyle(
+                        fontSize: 35,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87),
                   ),
                   SizedBox(
                     height: 10,
                   ),
                   Text('Faça login',
-                      style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black87)),
+                      style: TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87)),
                   SizedBox(
                     height: 5,
                   ),
@@ -102,7 +107,8 @@ class LoginScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const ResetPasswordScreen(),
+                                builder: (context) =>
+                                    const ResetPasswordScreen(),
                               ),
                             );
                           },
@@ -154,9 +160,7 @@ class LoginScreen extends StatelessWidget {
                     height: 45,
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(
-                            color: Colors.purple,
-                            width: 2),
+                        side: BorderSide(color: Colors.purple, width: 2),
                         backgroundColor: Colors.white,
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -170,35 +174,9 @@ class LoginScreen extends StatelessWidget {
                             ));
                       },
                       child: Text('Cadastrar-se',
-                          style: TextStyle(
-                              color: Colors.purple,
-                              fontSize: 15)),
+                          style: TextStyle(color: Colors.purple, fontSize: 15)),
                     ),
                   ),
-                  SizedBox(
-                    height: 25,
-                  ),
-                  Text(
-                    '____________________ Conectar usando ___________________',
-                    style: TextStyle(
-                      color: Colors.black,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 25,
-                  ),
-                  OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(
-                          color: Colors.purple,
-                        ),
-                        backgroundColor: Colors.white,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                        ),
-                      ),
-                      onPressed: () {},
-                      child: Icon(Icons.g_mobiledata_sharp))
                 ],
               ),
             )
