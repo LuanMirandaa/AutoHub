@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import 'package:auto_hub/services/cloudinary_service.dart';
 import 'package:auto_hub/services/firestore_service.dart';
 import 'package:auto_hub/helpers/format_number.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddEditCarScreen extends StatefulWidget {
   final User user;
@@ -29,15 +30,17 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
   final TextEditingController marcaController = TextEditingController();
   final TextEditingController quilometragemController = TextEditingController();
   final TextEditingController precoController = TextEditingController();
-  final TextEditingController localizacaoController = TextEditingController();
-
   final TextEditingController descricaoController = TextEditingController();
 
   Uint8List? imageData;
   String? imageUrl;
   String? condicao;
+  String? selectedEstado;
+  String? selectedMunicipio;
 
   final List<String> status = ['Novo', 'Seminovo', 'Usado'];
+  final List<String> estados = [];
+  final List<String> municipios = [];
 
   @override
   void initState() {
@@ -48,9 +51,37 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
       condicao = widget.car!.condicao;
       quilometragemController.text = widget.car!.quilometragem.toString();
       precoController.text = widget.car!.preco.toString();
-      localizacaoController.text = widget.car!.localizacao ?? '';
       descricaoController.text = widget.car!.descricao ?? '';
       imageUrl = widget.car!.imageUrl;
+      selectedEstado = widget.car!.estado;
+      selectedMunicipio = widget.car!.municipio;
+    }
+    fetchEstados();
+  }
+
+  // Busca os estados (IDs dos documentos na coleção "Localização")
+  Future<void> fetchEstados() async {
+    final snapshot =
+        await FirebaseFirestore.instance.collection('Localização').get();
+    setState(() {
+      estados.addAll(snapshot.docs
+          .map((doc) => doc.id)); // Pega o ID do documento (nome do estado)
+    });
+  }
+
+  // Busca os municípios associados ao estado selecionado
+  Future<void> fetchMunicipios(String estado) async {
+    final doc = await FirebaseFirestore.instance
+        .collection('Localização')
+        .doc(estado)
+        .get();
+    if (doc.exists) {
+      final data = doc.data() as Map<String, dynamic>;
+      setState(() {
+        municipios.clear();
+        municipios.addAll(List<String>.from(
+            data['municipios'])); // Pega o array de municípios
+      });
     }
   }
 
@@ -103,8 +134,7 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
                   child: Image.asset('assets/images/photo_add_icon.png')),
             const SizedBox(height: 30),
             TextField(
-              controller:
-                  modeloController, // Color.fromARGB(255, 206, 147, 216)
+              controller: modeloController,
               decoration: const InputDecoration(
                   labelText: 'Modelo',
                   labelStyle:
@@ -138,7 +168,7 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
             DropdownButtonFormField<String>(
               value: condicao,
               decoration: const InputDecoration(
-                labelText: 'Condicão',
+                labelText: 'Condição',
                 labelStyle:
                     TextStyle(color: Color.fromARGB(225, 117, 117, 117)),
                 focusedBorder: OutlineInputBorder(
@@ -198,12 +228,10 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
                       borderRadius: BorderRadius.all(Radius.circular(10)))),
             ),
             const SizedBox(height: 15),
-            TextField(
-              controller: localizacaoController,
+            DropdownButtonFormField<String>(
+              value: selectedEstado,
               decoration: const InputDecoration(
-                hintText: 'Ex: São Paulo - SP',
-                hintStyle: TextStyle(color: Colors.grey),
-                labelText: 'Localização',
+                labelText: 'Estado',
                 labelStyle:
                     TextStyle(color: Color.fromARGB(225, 117, 117, 117)),
                 focusedBorder: OutlineInputBorder(
@@ -214,6 +242,48 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
                     borderSide: BorderSide(color: Colors.purple, width: 2.0),
                     borderRadius: BorderRadius.all(Radius.circular(10))),
               ),
+              items: estados.map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedEstado = newValue;
+                  selectedMunicipio = null;
+                  if (newValue != null) {
+                    fetchMunicipios(newValue);
+                  }
+                });
+              },
+            ),
+            const SizedBox(height: 15),
+            DropdownButtonFormField<String>(
+              value: selectedMunicipio,
+              decoration: const InputDecoration(
+                labelText: 'Município',
+                labelStyle:
+                    TextStyle(color: Color.fromARGB(225, 117, 117, 117)),
+                focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                        color: Color.fromARGB(255, 206, 147, 216), width: 2.0),
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.purple, width: 2.0),
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+              ),
+              items: municipios.map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedMunicipio = newValue;
+                });
+              },
             ),
             const SizedBox(height: 15),
             TextField(
@@ -296,7 +366,9 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
     if (modeloController.text.isEmpty ||
         marcaController.text.isEmpty ||
         quilometragemController.text.isEmpty ||
-        precoController.text.isEmpty) {
+        precoController.text.isEmpty ||
+        selectedEstado == null ||
+        selectedMunicipio == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Por favor, preencha todos os campos obrigatórios.'),
@@ -332,12 +404,13 @@ class _AddEditCarScreenState extends State<AddEditCarScreen> {
       marca: marcaController.text,
       quilometragem: quilometragem,
       preco: preco,
-      localizacao: localizacaoController.text,
-      condicao: condicao!,
       descricao:
           descricaoController.text.isNotEmpty ? descricaoController.text : null,
       imageUrl: uploadedImageUrl ?? imageUrl,
       userId: widget.user.uid,
+      condicao: condicao!,
+      estado: selectedEstado!,
+      municipio: selectedMunicipio!,
     );
 
     final firestoreService = FirestoreService();

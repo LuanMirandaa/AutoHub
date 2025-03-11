@@ -113,7 +113,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
             _buildInfoTile('Condição', widget.car.condicao),
             _buildInfoTile('Quilometragem',
                 '${formatNumber(widget.car.quilometragem)} Km'),
-            _buildInfoTile('Localização', widget.car.localizacao),
+            _buildInfoTile('Localização', widget.car.municipio, widget.car.estado),
             const SizedBox(height: 10),
             Container(
               width: double.infinity,
@@ -241,7 +241,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
     );
   }
 
-  Widget _buildInfoTile(String title, String value) {
+  Widget _buildInfoTile(String title, String value, [String? additionalValue]) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Container(
@@ -251,7 +251,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
           borderRadius: BorderRadius.circular(10),
         ),
         child: Text(
-          '$title: $value',
+          '$title: $value${additionalValue != null ? ', $additionalValue' : ''}',
           style: const TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 18,

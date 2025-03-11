@@ -5,10 +5,11 @@ class Car {
   final String condicao;
   final double quilometragem;
   final double preco;
-  final String localizacao;
   final String? descricao;
   final String? imageUrl;
   final String userId;
+  final String estado;
+  final String municipio;
 
   Car({
     required this.id,
@@ -19,8 +20,9 @@ class Car {
     this.descricao,
     this.imageUrl,
     required this.userId,
-    required this.localizacao,
     required this.condicao,
+    required this.estado,
+    required this.municipio,
   });
 
   Map<String, dynamic> toMap() {
@@ -31,10 +33,11 @@ class Car {
       'condicao': condicao,
       'quilometragem': quilometragem,
       'preco': preco,
-      'localizacao': localizacao,
       'descricao': descricao,
       'imageUrl': imageUrl,
       'userId': userId,
+      'estado': estado,
+      'municipio': municipio,
     };
   }
 
@@ -46,10 +49,11 @@ class Car {
       condicao: map['condicao'],
       quilometragem: map['quilometragem'].toDouble(),
       preco: map['preco'].toDouble(),
-      localizacao: map['localizacao'],
       descricao: map['descricao'],
       imageUrl: map['imageUrl'],
       userId: map['userId'],
+      estado: map['estado'],
+      municipio: map['municipio'],
     );
   }
 }

@@ -382,6 +382,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
+                                            Text(
+                                              'Localização: ${model.municipio} - ${model.estado}',
+                                              style: const TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: 16,
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ),
