@@ -23,12 +23,40 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController minPriceController = TextEditingController();
   TextEditingController maxPriceController = TextEditingController();
   String selectedBrand = '';
+  String selectedEstado = '';
+  String selectedMunicipio = '';
+  String selectedCondicao = '';
+  List<String> estados = [];
+  List<String> municipios = [];
+
+  Future<void> fetchMunicipios(String estado) async {
+    final doc = await FirebaseFirestore.instance
+        .collection('Localização')
+        .doc(estado)
+        .get();
+    if (doc.exists) {
+      final data = doc.data() as Map<String, dynamic>;
+      setState(() {
+        municipios.clear();
+        municipios.addAll(List<String>.from(data['municipios']));
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     _storeCurrentUserData();
     refresh();
+    fetchEstados();
+  }
+
+  Future<void> fetchEstados() async {
+    final snapshot =
+        await FirebaseFirestore.instance.collection('Localização').get();
+    setState(() {
+      estados.addAll(snapshot.docs.map((doc) => doc.id));
+    });
   }
 
   Future<void> refresh() async {
@@ -78,13 +106,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> storeUserData(String uid, String email, String name) async {
-  await FirebaseFirestore.instance.collection('users').doc(uid).set({
-    'uid': uid,
-    'email': email,
-    'name': name,
-    'avatarImage': 'assets/images/avatar.png'
-  });
-}
+    await FirebaseFirestore.instance.collection('users').doc(uid).set({
+      'uid': uid,
+      'email': email,
+      'name': name,
+      'avatarImage': 'assets/images/avatar.png'
+    });
+  }
 
   void applyFilters() {
     List<Car> temp = listCars;
@@ -103,6 +131,18 @@ class _HomeScreenState extends State<HomeScreen> {
       temp = temp.where((car) => car.marca == selectedBrand).toList();
     }
 
+    if (selectedEstado.isNotEmpty) {
+      temp = temp.where((car) => car.estado == selectedEstado).toList();
+    }
+
+    if (selectedMunicipio.isNotEmpty) {
+      temp = temp.where((car) => car.municipio == selectedMunicipio).toList();
+    }
+
+    if (selectedCondicao.isNotEmpty) {
+      temp = temp.where((car) => car.condicao == selectedCondicao).toList();
+    }
+
     setState(() {
       filteredCars = temp;
     });
@@ -112,102 +152,197 @@ class _HomeScreenState extends State<HomeScreen> {
     minPriceController.clear();
     maxPriceController.clear();
     selectedBrand = '';
+    selectedEstado = '';
+    selectedMunicipio = '';
+    selectedCondicao = '';
     applyFilters();
   }
 
   void showFilterModal() {
     showModalBottomSheet(
       context: context,
+      isScrollControlled:
+          true, // Permite que o BottomSheet ocupe mais espaço na tela
       builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  Text('Filtros', style: TextStyle(fontSize: 20)),
-                ],
-              ),
-              SizedBox(height: 15),
-              Row(
-                children: [
-                  Text('Preço'),
-                ],
-              ),
-              SizedBox(height: 10),
-              TextField(
-                controller: minPriceController,
-                decoration: const InputDecoration(
-                  labelText: 'Preço Mínimo',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10))),
-                ),
-                keyboardType: TextInputType.number,
-              ),
-              SizedBox(height: 5),
-              TextField(
-                controller: maxPriceController,
-                decoration: const InputDecoration(
-                  labelText: 'Preço Máximo',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10))),
-                ),
-                keyboardType: TextInputType.number,
-              ),
-              SizedBox(height: 10),
-              Row(
-                children: [
-                  Text('Marcas'),
-                ],
-              ),
-              DropdownButtonFormField<String>(
-                value: selectedBrand.isEmpty ? null : selectedBrand,
-                decoration: const InputDecoration(),
-                items: listCars
-                    .map((car) => car.marca)
-                    .toSet()
-                    .map((marca) => DropdownMenuItem(
-                          value: marca,
-                          child: Text(marca),
-                        ))
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    selectedBrand = value ?? '';
-                  });
-                },
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      applyFilters();
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
+        return StatefulBuilder(
+          // Adicione o StatefulBuilder
+          builder: (BuildContext context, StateSetter setModalState) {
+            return SingleChildScrollView(
+              child: Container(
+                color: Colors.white,
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Text('Filtros', style: TextStyle(fontSize: 20)),
+                      ],
                     ),
-                    child: const Text('Aplicar Filtros',
-                        style: TextStyle(color: Colors.white)),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      clearFilters();
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey,
+                    SizedBox(height: 15),
+                    Row(
+                      children: [
+                        Text('Preço'),
+                      ],
                     ),
-                    child: const Text('Limpar Filtros',
-                        style: TextStyle(color: Colors.black87)),
-                  ),
-                ],
+                    SizedBox(height: 12),
+                    TextField(
+                      controller: minPriceController,
+                      decoration: const InputDecoration(
+                        labelText: 'Preço mínimo',
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                    SizedBox(height: 10),
+                    TextField(
+                      controller: maxPriceController,
+                      decoration: const InputDecoration(
+                        labelText: 'Preço máximo',
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Text('Marcas'),
+                      ],
+                    ),
+                    DropdownButtonFormField<String>(
+                      value: selectedBrand.isEmpty ? null : selectedBrand,
+                      decoration: const InputDecoration(),
+                      items: listCars
+                          .map((car) => car.marca)
+                          .toSet()
+                          .map((marca) => DropdownMenuItem(
+                                value: marca,
+                                child: Text(marca),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        setModalState(() {
+                          selectedBrand = value ?? '';
+                        });
+                      },
+                    ),
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Text('Localização'),
+                      ],
+                    ),
+                    SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      value: selectedEstado.isEmpty ? null : selectedEstado,
+                      decoration: const InputDecoration(
+                        labelText: 'Selecione um estado',
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
+                      ),
+                      items: estados
+                          .map((estado) => DropdownMenuItem(
+                                value: estado,
+                                child: Text(estado),
+                              ))
+                          .toList(),
+                      onChanged: (value) async {
+                        setModalState(() {
+                          selectedEstado = value ?? '';
+                          selectedMunicipio =
+                              ''; // Limpa o município ao mudar o estado
+                          municipios.clear(); // Limpa a lista de municípios
+                        });
+
+                        if (value != null) {
+                          await fetchMunicipios(
+                              value); // Carrega os municípios do estado selecionado
+                          setModalState(
+                              () {}); // Força a atualização do DropdownButtonFormField de municípios
+                        }
+                      },
+                    ),
+                    SizedBox(height: 10),
+                    DropdownButtonFormField<String>(
+                      value:
+                          selectedMunicipio.isEmpty ? null : selectedMunicipio,
+                      decoration: const InputDecoration(
+                        labelText: 'Selecione um município',
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
+                      ),
+                      items: municipios
+                          .map((municipio) => DropdownMenuItem(
+                                value: municipio,
+                                child: Text(municipio),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        setModalState(() {
+                          selectedMunicipio = value ?? '';
+                        });
+                      },
+                    ),
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Text('Condição'),
+                      ],
+                    ),
+                    DropdownButtonFormField<String>(
+                      value: selectedCondicao.isEmpty ? null : selectedCondicao,
+                      decoration: const InputDecoration(),
+                      items: ['Novo', 'Seminovo', 'Usado']
+                          .map((condicao) => DropdownMenuItem(
+                                value: condicao,
+                                child: Text(condicao),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        setModalState(() {
+                          selectedCondicao = value ?? '';
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            applyFilters();
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange,
+                          ),
+                          child: const Text('Aplicar Filtros',
+                              style: TextStyle(color: Colors.white)),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            clearFilters();
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey,
+                          ),
+                          child: const Text('Limpar Filtros',
+                              style: TextStyle(color: Colors.black87)),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -220,7 +355,10 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text(
           'Auto Hub',
-          style: TextStyle(fontSize: 22,fontWeight: FontWeight.w500,color: Color.fromARGB(255, 84, 4, 98) ),
+          style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w500,
+              color: Color.fromARGB(255, 84, 4, 98)),
         ),
         centerTitle: true,
       ),
